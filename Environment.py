@@ -19,7 +19,8 @@ robot = Robot(config, pygame, screen, (50,50,100), [100, 700], [0, -1] , 25)
 """ball = pygame.image.load("intro_ball.gif")
 ballrect = ball.get_rect()"""
 
-def render(robot):
+def render(robot, obstacles):
+    screen.fill(C.BLACK)
     robot.draw()
 
 while 1:
@@ -28,23 +29,26 @@ while 1:
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
-                robot.acellarate("left")
-            elif event.key == pygame.K_k:
-                robot.acellarate("right")
+                robot.acellarate(robot.LEFT,   1)
+            elif event.key == pygame.K_o:
+                robot.acellarate(robot.RIGHT,  1)
+            if event.key == pygame.K_s:
+                robot.acellarate(robot.LEFT,  -1)
+            elif event.key == pygame.K_l:
+                robot.acellarate(robot.RIGHT, -1)
+            elif event.key == pygame.K_t:
+                robot.acellarate(robot.LEFT,   1)
+                robot.acellarate(robot.RIGHT,  1)
+            elif event.key == pygame.K_g:
+                robot.acellarate(robot.LEFT,  -1)
+                robot.acellarate(robot.RIGHT, -1)
+            elif event.key == pygame.K_x:
+                robot.stop()
 
-    robot.update_position()
-
-
-    """ballrect = ballrect.move(speed)
-    if ballrect.left < 0 or ballrect.right > width:
-        speed[0] = -speed[0]
-    if ballrect.top < 0 or ballrect.bottom > height:
-        speed[1] = -speed[1]
-
-    screen.fill(C.BLACK)
-    screen.blit(ball, ballrect)"""
+    robot.move()
 
     # update()
-    render(robot)
+
+    render(robot, [])
 
     pygame.display.flip()

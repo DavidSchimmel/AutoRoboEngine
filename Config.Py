@@ -6,8 +6,9 @@ class Config:
     # FRAMES_PER_SECOND = 30
 
     # Robot
-    ACCELERATION = 0.01
+    ACCELERATION = 0.001
+    BALL_SIZE = 25
+    MAX_VELOCITY = math.inf
     N_SENSORS = 16
     SENSOR_FREQUENCY = 30
-    MAX_VELOCITY = math.inf
-    BALL_SIZE = 25
+    SENSOR_RANGE = 200
