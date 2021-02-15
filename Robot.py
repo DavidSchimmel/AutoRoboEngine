@@ -1,8 +1,9 @@
 from pygame.draw import (circle, aaline)
 import math
+from collision_managment import resolve_collision
 
 class Robot:
-    def __init__(self, config, pygame, display, colour, position, orientation = (0, -1), size = 10):
+    def __init__(self, config, pygame, display, colour, position, env, orientation = (0, -1), size = 10, display_size=(700,700)):
         self.LEFT = "left"
         self.RIGHT = "right"
 
@@ -19,6 +20,9 @@ class Robot:
         self.size           = size
 
         self.draw_explicit(self.game, self.display, self.colour, self.position, self.size, self.orientation)
+        
+        self.env = env
+        self.env_size = display_size
 
     def draw_explicit(self, pygame, display, colour, position, size, orientation):
         # draw robot body as circle
@@ -40,6 +44,8 @@ class Robot:
             velocity = (self.velocity_right + self.velocity_left) / 2
             self.position[0] = self.position[0] + velocity * self.orientation[0] * delta_t
             self.position[1] = self.position[1] + velocity * self.orientation[1] * delta_t
+
+            self.position[0], self.position[1] = resolve_collision(self.position, (velocity * self.orientation[0], velocity * self.orientation[1]), self.size, self.env, self.env_size)
             return self.position
 
 
@@ -58,6 +64,9 @@ class Robot:
 
         self.update_position(x_updated, y_updated)
         self.rotate(angle_updated)
+
+        velocity = (self.velocity_right + self.velocity_left) / 2
+        self.position[0], self.position[1] = resolve_collision(self.position, (velocity * self.orientation[0], velocity * self.orientation[1]), self.size, self.env, self.env_size)
 
         return self.position
 
