@@ -15,7 +15,7 @@ speed = [2, 2]
 screen = pygame.display.set_mode(size)
 
 env=create_environment(size, 4)
-robot = Robot(config, pygame, screen, C.ROBOT_CYAN, [400, 400], env, 90 , 25, size)
+robot = Robot(config, pygame, screen, size, env, C.ROBOT_CYAN, [400, 400], 90 , 25)
 
 def render(robot, obstacles):
     robot.draw()

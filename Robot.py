@@ -3,7 +3,7 @@ import math
 from collision_managment import resolve_collision
 
 class Robot:
-    def __init__(self, config, pygame, display, colour, position, env, angle_degree, size = 10, display_size=(700,700)):
+    def __init__(self, config, pygame, display, display_size, env, colour, position, angle_degree, size = 10):
         self.LEFT = "left"
         self.RIGHT = "right"
 
@@ -44,7 +44,6 @@ class Robot:
         return orientation_vector
 
     def move(self):
-        # wheel_distance = self.size / 2
         delta_t = 1
 
         if self.velocity_left == self.velocity_right:
@@ -69,7 +68,6 @@ class Robot:
         self.update_position(x_updated, y_updated)
 
         velocity = (self.velocity_right + self.velocity_left) / 2
-        #self.position[0], self.position[1] = resolve_collision(self.position, (velocity * self.orientation[0], velocity * self.orientation[1]), self.size, self.env, self.env_size)
         self.position[0], self.position[1] = resolve_collision(self.position, (x_updated, y_updated), self.size, self.env, self.env_size)
 
         return self.position
@@ -97,3 +95,8 @@ class Robot:
             elif side == self.RIGHT:
                 self.velocity_right = 0
         return [self.velocity_left, self.velocity_right]
+
+    def check_sensors():
+
+
+        return

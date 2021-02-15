@@ -34,16 +34,16 @@ def collision_rect(c, radius, v, r):
    collision = False
    if ( dx * dx + dy * dy ) <= radius * radius: #there is a collision
         collision=True
-        
+
         if dx==0 and dy>=0: theta = math.pi/2
         elif dx==0 and dy<0: theta = -math.pi/2
         else: theta = math.atan(dy/dx)
 
         delta = radius - math.sqrt(dx*dx + dy*dy)
-        
+
         d_x = delta*math.cos(theta)
         d_y = delta*math.sin(theta)
-        
+
         new_x = c[0] - math.copysign(1, dx)*d_x
         new_y = c[1] - math.copysign(1, dy)*d_y
    else:
@@ -56,15 +56,15 @@ def collision_rect(c, radius, v, r):
 def collision_circle(c, radius, v, C, R):
     dx = c[0] - C[0]
     dy = c[1] - C[1]
-    dr = radius + R 
+    dr = radius + R
     collision=False
     if (dx*dx + dy*dy) <= dr * dr: #there is a collision
         collision=True
         v_norm_x = 0 if v[0]==0 else v[0]/math.sqrt(v[0]*v[0]+v[1]*v[1])
         v_norm_y = 0 if v[1]==0 else v[1]/math.sqrt(v[0]*v[0]+v[1]*v[1])
-        d = (radius + R) - math.sqrt(dx*dx + dy*dy) 
-        new_x = c[0] - d * v_norm_x 
-        new_y = c[1] - d * v_norm_y 
+        d = (radius + R) - math.sqrt(dx*dx + dy*dy)
+        new_x = c[0] - d * v_norm_x
+        new_y = c[1] - d * v_norm_y
         #update velocity
         #n = (new_x - C[0], new_y - C[1])
         #cost = (v[0]*n[0] + v[1]*n[1]) / (math.sqrt(n[0]*n[0]+n[1]*n[1]))
@@ -92,6 +92,6 @@ def resolve_collision(s, v, robot_R, ob_list, size):
             s_x=min(s_x, size[0]-robot_R)
             s_y=max(robot_R, s_y_tmp)
             s_y=min(s_y, size[1]-robot_R)
-            if abs(s[0]-s_x)>abs(s[0]-m_x): m_x=s_x 
-            if abs(s[0]-s_y)>abs(s[0]-m_y): m_y=s_y 
+            if abs(s[0]-s_x)>abs(s[0]-m_x): m_x=s_x
+            if abs(s[0]-s_y)>abs(s[0]-m_y): m_y=s_y
     return m_x, m_y
