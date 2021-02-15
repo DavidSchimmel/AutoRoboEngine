@@ -1,8 +1,9 @@
 from pygame.draw import (circle, aaline)
 import math
+from collision_managment import resolve_collision
 
 class Robot:
-    def __init__(self, config, pygame, display, colour, position, angle_degree = 90, size = 10):
+    def __init__(self, config, pygame, display, colour, position, env, angle_degree, size = 10, display_size=(700,700)):
         self.LEFT = "left"
         self.RIGHT = "right"
 
@@ -10,6 +11,8 @@ class Robot:
 
         self.game           = pygame
         self.display        = display
+        self.env = env
+        self.env_size = display_size
 
         self.velocity_left  = 0
         self.velocity_right = 0
@@ -49,6 +52,8 @@ class Robot:
             velocity = (self.velocity_right + self.velocity_left) / 2
             self.position[0] = self.position[0] + velocity * orientation[0] * delta_t
             self.position[1] = self.position[1] + velocity * orientation[1] * delta_t
+
+            self.position[0], self.position[1] = resolve_collision(self.position, (velocity * orientation[0], velocity * orientation[1]), self.size, self.env, self.env_size)
             return self.position
 
         omega = (self.velocity_right - self.velocity_left) / self.size
@@ -62,6 +67,10 @@ class Robot:
 
         self.angle = self.angle + omega * delta_t
         self.update_position(x_updated, y_updated)
+
+        velocity = (self.velocity_right + self.velocity_left) / 2
+        #self.position[0], self.position[1] = resolve_collision(self.position, (velocity * self.orientation[0], velocity * self.orientation[1]), self.size, self.env, self.env_size)
+        self.position[0], self.position[1] = resolve_collision(self.position, (x_updated, y_updated), self.size, self.env, self.env_size)
 
         return self.position
 
