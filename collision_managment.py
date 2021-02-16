@@ -51,4 +51,5 @@ def resolve_collision(s, robot_R, ob_list, size):
         if ob[0] == 'c':
             if (collision_circle(s, robot_R, ob[1], ob[2])):
                 return True
+    if s[0]<robot_R or s[0]>size[0]-robot_R or s[1]<0 or s[1]>size[1]-robot_R: return True
     return False
