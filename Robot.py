@@ -49,10 +49,10 @@ class Robot:
         if self.velocity_left == self.velocity_right:
             orientation = self.get_orientation_vector(self.angle, 1)
             velocity = (self.velocity_right + self.velocity_left) / 2
-            self.position[0] = self.position[0] + velocity * orientation[0] * delta_t
-            self.position[1] = self.position[1] + velocity * orientation[1] * delta_t
+            new_x = self.position[0] + velocity * orientation[0] * delta_t
+            new_y = self.position[1] + velocity * orientation[1] * delta_t
 
-            self.position[0], self.position[1] = resolve_collision(self.position, (velocity * orientation[0], velocity * orientation[1]), self.size, self.env, self.env_size)
+            self.position[0], self.position[1] = resolve_collision(self.position, (new_x, new_y), self.size, self.env, self.env_size)
             return self.position
 
         omega = (self.velocity_right - self.velocity_left) / self.size
@@ -65,9 +65,7 @@ class Robot:
         y_updated  = math.sin(omega * delta_t) * (self.position[0] - ICC_x) + math.cos(omega * delta_t) * (self.position[1] - ICC_y) + ICC_y
 
         self.angle = self.angle + omega * delta_t
-        self.update_position(x_updated, y_updated)
 
-        velocity = (self.velocity_right + self.velocity_left) / 2
         self.position[0], self.position[1] = resolve_collision(self.position, (x_updated, y_updated), self.size, self.env, self.env_size)
 
         return self.position

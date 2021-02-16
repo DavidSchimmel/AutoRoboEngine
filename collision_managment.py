@@ -21,13 +21,18 @@ def render_environment(screen, pg, ob_list): #print the environment on the scree
         elif o[0]=='c':
             pg.draw.circle(screen, obstacle_color, o[1], o[2])
 
-def collision_rect(c, radius, v, r):
+def collision_rect(c, start, radius, r):
    left=r[0]
    top=r[1]
    right=left+r[2]
    bottom=top+r[3]
    closestX = left if c[0] < left else (right if c[0] > right else c[0])
    closestY = top if c[1] < top else (bottom if c[1] > bottom else c[1])
+   closestX_start = left if start[0] < left else (right if start[0] > right else start[0])
+   closestY_start = top if start[1] < top else (bottom if start[1] > bottom else start[1])
+   if (closestX != closestX_start): closestX=closestX_start
+   if (closestY != closestY_start): closestY=closestY_start
+
    dx = closestX - c[0]
    dy = closestY - c[1]
 
@@ -78,7 +83,7 @@ def collision_circle(c, radius, v, C, R):
     return new_x, new_y, collision
 
 #to call after every robot update (in the engine, not graphical)
-def resolve_collision(s, v, robot_R, ob_list, size):
+def resolve_collision(start, s, robot_R, ob_list, size):
     s_x=max(robot_R, s[0])
     s_x=min(s_x, size[0]-robot_R)
     s_y=max(robot_R, s[1])
@@ -86,7 +91,7 @@ def resolve_collision(s, v, robot_R, ob_list, size):
     m_x=s_x; m_y=s_y
     for ob in ob_list:
         if ob[0] == 'r':
-            s_x_tmp, s_y_tmp, collision = collision_rect(s, robot_R, v, ob[1])
+            s_x_tmp, s_y_tmp, collision = collision_rect(s, start, robot_R, ob[1])
         if collision:
             s_x=max(robot_R, s_x_tmp)
             s_x=min(s_x, size[0]-robot_R)
