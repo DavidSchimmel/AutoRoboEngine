@@ -51,8 +51,17 @@ class Robot:
             velocity = (self.velocity_right + self.velocity_left) / 2
             new_x = self.position[0] + velocity * orientation[0] * delta_t
             new_y = self.position[1] + velocity * orientation[1] * delta_t
+            if(resolve_collision((new_x, new_y), self.size, self.env, self.env_size)):
+                print('collision')
+                t=0
+                new_x = self.position[0]
+                new_y = self.position[1]
+                while(t<delta_t and not resolve_collision((new_x + velocity * orientation[0] * t, new_y + velocity * orientation[1] * t), self.size, self.env, self.env_size)):
+                    new_x = new_x + velocity * orientation[0] * t
+                    new_y = new_y + velocity * orientation[1] * t                       
+                    t+=0.01
+            self.position[0], self.position[1] = new_x, new_y
 
-            self.position[0], self.position[1] = resolve_collision(self.position, (new_x, new_y), self.size, self.env, self.env_size)
             return self.position
 
         omega = (self.velocity_right - self.velocity_left) / self.size
@@ -66,9 +75,30 @@ class Robot:
 
         self.angle = self.angle + omega * delta_t
 
-        self.position[0], self.position[1] = resolve_collision(self.position, (x_updated, y_updated), self.size, self.env, self.env_size)
+        if(resolve_collision((x_updated, y_updated), self.size, self.env, self.env_size)):
+            print('collision1')
+            t=0
+            angle = self.angle
+            x_updated = self.position[0]
+            y_updated = self.position[1]
+            x_updated_  = math.cos(omega * t) * (x_updated - ICC_x) - math.sin(omega * t) * (y_updated - ICC_y) + ICC_x
+            y_updated_  = math.sin(omega * t) * (x_updated - ICC_x) + math.cos(omega * t) * (y_updated - ICC_y) + ICC_y
+            while(t<delta_t and not resolve_collision( (x_updated_, y_updated_ ), self.size, self.env, self.env_size)):
+                x_updated=x_updated_
+                y_updated=y_updated_
+                x_updated_  = math.cos(omega * t) * (x_updated - ICC_x) - math.sin(omega * t) * (y_updated - ICC_y) + ICC_x
+                y_updated_  = math.sin(omega * t) * (x_updated - ICC_x) + math.cos(omega * t) * (y_updated - ICC_y) + ICC_y 
+                ICC_x = x_updated - R * math.sin(angle)
+                ICC_y = y_updated + R * math.cos(angle)
+                angle = angle + omega * t
+                t+=0.01
+            self.angle=angle
+        
+        self.position[0], self.position[1] = x_updated, y_updated
 
         return self.position
+
+
 
     def update_position(self, x, y):
         self.position[0] = x
