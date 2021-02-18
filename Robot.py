@@ -1,6 +1,7 @@
 from pygame.draw import (circle, aaline)
 import math
 from collision_managment import resolve_collision
+from Sensor import Sensor
 
 class Robot:
     def __init__(self, config, pygame, display, display_size, env, colour, position, angle_degree, size = 10):
@@ -21,6 +22,9 @@ class Robot:
         self.colour         = colour
         self.size           = size
 
+        self.sensors = self.initialize_sensors(self.config.SENSOR_COUNT, angle_degree, self.config.SENSOR_RANGE, self.config.SENSOR_COLOUR)
+        self.check_sensors()
+
         self.draw_explicit(self.game, self.display, self.colour, self.position, self.size, self.angle)
 
     def draw_explicit(self, pygame, display, colour, position, size, angle):
@@ -36,6 +40,7 @@ class Robot:
 
     def draw(self):
         self.draw_explicit(self.game, self.display, self.colour, self.position, self.size, self.angle)
+        self.draw_sensors()
 
     def get_orientation_vector(self, angle_radians, size_factor):
         orientation_normalized = (math.cos(angle_radians), math.sin(angle_radians))
@@ -64,7 +69,8 @@ class Robot:
         x_updated  = math.cos(omega * delta_t) * (self.position[0] - ICC_x) - math.sin(omega * delta_t) * (self.position[1] - ICC_y) + ICC_x
         y_updated  = math.sin(omega * delta_t) * (self.position[0] - ICC_x) + math.cos(omega * delta_t) * (self.position[1] - ICC_y) + ICC_y
 
-        self.angle = self.angle + omega * delta_t
+        rotation = omega * delta_t
+        self.rotate(rotation)
         self.update_position(x_updated, y_updated)
 
         velocity = (self.velocity_right + self.velocity_left) / 2
@@ -75,10 +81,18 @@ class Robot:
     def update_position(self, x, y):
         self.position[0] = x
         self.position[1] = y
+
+        for sensor in self.sensors:
+            sensor.shift_to(self.position)
+
         return self.position
 
-    def rotate_by_degree(self, angle_degree):
-        self.angle = self.angle + angle_degree * 180 / math.pi
+    def rotate(self, rotation):
+        self.angle = self.angle + rotation
+
+        for sensor in self.sensors:
+            sensor.rotate(rotation)
+
         return self.angle
 
     def acellarate(self, side, increment):
@@ -96,7 +110,22 @@ class Robot:
                 self.velocity_right = 0
         return [self.velocity_left, self.velocity_right]
 
-    def check_sensors():
+    def initialize_sensors(self, sensor_count, facing_angle_degree, sensor_range, sensor_colour):
+        spacing_degree = 360 / sensor_count
+        sensors = []
+        current_angle_degree = facing_angle_degree
+        for _ in range(sensor_count):
+            sensors.append(Sensor(self.position, self.size + 1, current_angle_degree, sensor_range, sensor_colour))
+            current_angle_degree = current_angle_degree + spacing_degree
 
+        return sensors
+
+    def check_sensors(self):
+        for sensor in self.sensors:
+            sensor.update()
 
         return
+
+    def draw_sensors(self):
+        for sensor in self.sensors:
+            self.game.draw.aaline(self.display, sensor.colour, sensor.root_vector, sensor.direction_vector)

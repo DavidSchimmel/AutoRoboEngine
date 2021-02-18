@@ -9,6 +9,7 @@ class Config:
     ACCELERATION = 0.001
     BALL_SIZE = 25
     MAX_VELOCITY = math.inf
-    N_SENSORS = 16
+    SENSOR_COUNT = 16
     SENSOR_FREQUENCY = 30
     SENSOR_RANGE = 200
+    SENSOR_COLOUR = (122, 80, 20)

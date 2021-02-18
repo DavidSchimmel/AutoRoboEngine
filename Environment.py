@@ -43,6 +43,7 @@ while 1:
                 robot.stop()
 
     robot.move()
+    robot.check_sensors()
 
     render_environment(screen, pygame, env)
     render(robot, [])
