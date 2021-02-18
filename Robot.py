@@ -50,14 +50,28 @@ class Robot:
 
     def move(self):
         delta_t = 1
-
+        microstep = 0.01
         if self.velocity_left == self.velocity_right:
             orientation = self.get_orientation_vector(self.angle, 1)
             velocity = (self.velocity_right + self.velocity_left) / 2
-            self.position[0] = self.position[0] + velocity * orientation[0] * delta_t
-            self.position[1] = self.position[1] + velocity * orientation[1] * delta_t
+            new_x = self.position[0] + velocity * orientation[0] * delta_t
+            new_y = self.position[1] + velocity * orientation[1] * delta_t
+            if(resolve_collision((new_x, new_y), self.size, self.env, self.env_size)):
+                t=0
+                new_x = self.position[0]
+                new_y = self.position[1]
+                while(t<delta_t and not resolve_collision((new_x + velocity * orientation[0] * microstep, new_y + velocity * orientation[1] * microstep), self.size, self.env, self.env_size)):
+                    new_x = new_x + velocity * orientation[0] * microstep
+                    new_y = new_y + velocity * orientation[1] * microstep
+                    t+=microstep
+                while(t<delta_t): #translation
+                    if not resolve_collision((new_x + velocity * orientation[0] * microstep, new_y), self.size, self.env, self.env_size):
+                        new_x=new_x + velocity * orientation[0] * microstep
+                    if not resolve_collision((new_x, new_y + velocity * orientation[1] * microstep), self.size, self.env, self.env_size):
+                        new_y=new_y + velocity * orientation[1] * microstep
+                    t+=microstep
+            self.position[0], self.position[1] = new_x, new_y
 
-            self.position[0], self.position[1] = resolve_collision(self.position, (velocity * orientation[0], velocity * orientation[1]), self.size, self.env, self.env_size)
             return self.position
 
         omega = (self.velocity_right - self.velocity_left) / self.size
@@ -73,10 +87,36 @@ class Robot:
         self.rotate(rotation)
         self.update_position(x_updated, y_updated)
 
-        velocity = (self.velocity_right + self.velocity_left) / 2
-        self.position[0], self.position[1] = resolve_collision(self.position, (x_updated, y_updated), self.size, self.env, self.env_size)
+        if(resolve_collision((x_updated, y_updated), self.size, self.env, self.env_size)):
+            t=0
+            angle = self.angle
+            x_updated = self.position[0]
+            y_updated = self.position[1]
+            x_updated_  = math.cos(omega * microstep) * (x_updated - ICC_x) - math.sin(omega * microstep) * (y_updated - ICC_y) + ICC_x
+            y_updated_  = math.sin(omega * microstep) * (x_updated - ICC_x) + math.cos(omega * microstep) * (y_updated - ICC_y) + ICC_y
+            while(t<delta_t and not resolve_collision( (x_updated_, y_updated_ ), self.size, self.env, self.env_size)):
+                x_updated=x_updated_
+                y_updated=y_updated_
+                x_updated_  = math.cos(omega * microstep) * (x_updated - ICC_x) - math.sin(omega * microstep) * (y_updated - ICC_y) + ICC_x
+                y_updated_  = math.sin(omega * microstep) * (x_updated - ICC_x) + math.cos(omega * microstep) * (y_updated - ICC_y) + ICC_y
+                ICC_x = x_updated - R * math.sin(angle)
+                ICC_y = y_updated + R * math.cos(angle)
+                angle = angle + omega * microstep
+                t+=microstep
+            self.angle=angle
+            orientation = self.get_orientation_vector(self.angle, 1)
+            velocity = (self.velocity_right + self.velocity_left) / 2
+            while(t<delta_t): #translation
+                if not resolve_collision((x_updated + velocity * orientation[0] * microstep, y_updated), self.size, self.env, self.env_size):
+                    x_updated=x_updated + velocity * orientation[0] * microstep
+                if not resolve_collision((x_updated, y_updated + velocity * orientation[1] * microstep), self.size, self.env, self.env_size):
+                    y_updated=y_updated + velocity * orientation[1] * microstep
+                t+=microstep
+        self.position[0], self.position[1] = x_updated, y_updated
 
         return self.position
+
+
 
     def update_position(self, x, y):
         self.position[0] = x
