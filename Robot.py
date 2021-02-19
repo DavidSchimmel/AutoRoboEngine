@@ -4,7 +4,7 @@ from collision_managment import resolve_collision
 from Sensor import Sensor
 
 class Robot:
-    def __init__(self, config, pygame, display, display_size, env, colour, position, angle_degree, size = 10):
+    def __init__(self, config, pygame, display, display_size, environment, colour, position, angle_degree, size = 10):
         self.LEFT = "left"
         self.RIGHT = "right"
 
@@ -12,8 +12,8 @@ class Robot:
 
         self.game           = pygame
         self.display        = display
-        self.env = env
-        self.env_size = display_size
+        self.environment    = environment
+        self.environment_size = display_size
 
         self.velocity_left  = 0
         self.velocity_right = 0
@@ -22,7 +22,7 @@ class Robot:
         self.colour         = colour
         self.size           = size
 
-        self.sensors = self.initialize_sensors(self.config.SENSOR_COUNT, angle_degree, self.config.SENSOR_RANGE, self.config.SENSOR_COLOUR)
+        self.sensors = self.initialize_sensors(self.config.SENSOR_COUNT, angle_degree, self.config.SENSOR_RANGE, self.config.SENSOR_COLOUR, environment)
         self.check_sensors()
 
         self.draw_explicit(self.game, self.display, self.colour, self.position, self.size, self.angle)
@@ -54,23 +54,24 @@ class Robot:
         if self.velocity_left == self.velocity_right:
             orientation = self.get_orientation_vector(self.angle, 1)
             velocity = (self.velocity_right + self.velocity_left) / 2
-            new_x = self.position[0] + velocity * orientation[0] * delta_t
-            new_y = self.position[1] + velocity * orientation[1] * delta_t
-            if(resolve_collision((new_x, new_y), self.size, self.env, self.env_size)):
+            x_updated = self.position[0] + velocity * orientation[0] * delta_t
+            y_updated = self.position[1] + velocity * orientation[1] * delta_t
+            if(resolve_collision((x_updated, y_updated), self.size, self.environment, self.environment_size)):
                 t=0
-                new_x = self.position[0]
-                new_y = self.position[1]
-                while(t<delta_t and not resolve_collision((new_x + velocity * orientation[0] * microstep, new_y + velocity * orientation[1] * microstep), self.size, self.env, self.env_size)):
-                    new_x = new_x + velocity * orientation[0] * microstep
-                    new_y = new_y + velocity * orientation[1] * microstep
+                x_updated = self.position[0]
+                y_updated = self.position[1]
+                while(t<delta_t and not resolve_collision((x_updated + velocity * orientation[0] * microstep, y_updated + velocity * orientation[1] * microstep), self.size, self.environment, self.environment_size)):
+                    x_updated = x_updated + velocity * orientation[0] * microstep
+                    y_updated = y_updated + velocity * orientation[1] * microstep
                     t+=microstep
                 while(t<delta_t): #translation
-                    if not resolve_collision((new_x + velocity * orientation[0] * microstep, new_y), self.size, self.env, self.env_size):
-                        new_x=new_x + velocity * orientation[0] * microstep
-                    if not resolve_collision((new_x, new_y + velocity * orientation[1] * microstep), self.size, self.env, self.env_size):
-                        new_y=new_y + velocity * orientation[1] * microstep
+                    if not resolve_collision((x_updated + velocity * orientation[0] * microstep, y_updated), self.size, self.environment, self.environment_size):
+                        x_updated=x_updated + velocity * orientation[0] * microstep
+                    if not resolve_collision((x_updated, y_updated + velocity * orientation[1] * microstep), self.size, self.environment, self.environment_size):
+                        y_updated=y_updated + velocity * orientation[1] * microstep
                     t+=microstep
-            self.position[0], self.position[1] = new_x, new_y
+
+            self.update_position(x_updated, y_updated)
 
             return self.position
 
@@ -84,17 +85,15 @@ class Robot:
         y_updated  = math.sin(omega * delta_t) * (self.position[0] - ICC_x) + math.cos(omega * delta_t) * (self.position[1] - ICC_y) + ICC_y
 
         rotation = omega * delta_t
-        self.rotate(rotation)
-        self.update_position(x_updated, y_updated)
 
-        if(resolve_collision((x_updated, y_updated), self.size, self.env, self.env_size)):
+        if(resolve_collision((x_updated, y_updated), self.size, self.environment, self.environment_size)):
             t=0
             angle = self.angle
             x_updated = self.position[0]
             y_updated = self.position[1]
             x_updated_  = math.cos(omega * microstep) * (x_updated - ICC_x) - math.sin(omega * microstep) * (y_updated - ICC_y) + ICC_x
             y_updated_  = math.sin(omega * microstep) * (x_updated - ICC_x) + math.cos(omega * microstep) * (y_updated - ICC_y) + ICC_y
-            while(t<delta_t and not resolve_collision( (x_updated_, y_updated_ ), self.size, self.env, self.env_size)):
+            while(t<delta_t and not resolve_collision( (x_updated_, y_updated_ ), self.size, self.environment, self.environment_size)):
                 x_updated=x_updated_
                 y_updated=y_updated_
                 x_updated_  = math.cos(omega * microstep) * (x_updated - ICC_x) - math.sin(omega * microstep) * (y_updated - ICC_y) + ICC_x
@@ -107,15 +106,16 @@ class Robot:
             orientation = self.get_orientation_vector(self.angle, 1)
             velocity = (self.velocity_right + self.velocity_left) / 2
             while(t<delta_t): #translation
-                if not resolve_collision((x_updated + velocity * orientation[0] * microstep, y_updated), self.size, self.env, self.env_size):
+                if not resolve_collision((x_updated + velocity * orientation[0] * microstep, y_updated), self.size, self.environment, self.environment_size):
                     x_updated=x_updated + velocity * orientation[0] * microstep
-                if not resolve_collision((x_updated, y_updated + velocity * orientation[1] * microstep), self.size, self.env, self.env_size):
+                if not resolve_collision((x_updated, y_updated + velocity * orientation[1] * microstep), self.size, self.environment, self.environment_size):
                     y_updated=y_updated + velocity * orientation[1] * microstep
                 t+=microstep
-        self.position[0], self.position[1] = x_updated, y_updated
+
+        self.update_position(x_updated, y_updated)
+        self.rotate(rotation)
 
         return self.position
-
 
 
     def update_position(self, x, y):
@@ -150,22 +150,24 @@ class Robot:
                 self.velocity_right = 0
         return [self.velocity_left, self.velocity_right]
 
-    def initialize_sensors(self, sensor_count, facing_angle_degree, sensor_range, sensor_colour):
+    def initialize_sensors(self, sensor_count, facing_angle_degree, sensor_range, sensor_colour, environment):
         spacing_degree = 360 / sensor_count
         sensors = []
         current_angle_degree = facing_angle_degree
         for _ in range(sensor_count):
-            sensors.append(Sensor(self.position, self.size + 1, current_angle_degree, sensor_range, sensor_colour))
+            sensors.append(Sensor(self.position, self.size + 1, current_angle_degree, sensor_range, sensor_colour, environment))
             current_angle_degree = current_angle_degree + spacing_degree
 
         return sensors
 
     def check_sensors(self):
         for sensor in self.sensors:
-            sensor.update()
-
+            sensor.update(self.environment)
         return
 
     def draw_sensors(self):
         for sensor in self.sensors:
-            self.game.draw.aaline(self.display, sensor.colour, sensor.root_vector, sensor.direction_vector)
+            colour = sensor.colour
+            if (sensor.collision_detected):
+                colour = (222, 70, 10)
+            self.game.draw.aaline(self.display, colour, sensor.root_vector, sensor.direction_vector)

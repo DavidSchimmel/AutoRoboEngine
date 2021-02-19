@@ -1,2 +1,2 @@
 BLACK = 0, 0, 0
-ROBOT_CYAN = (0, 255, 255)
+ROBOT_CYAN = (10, 50, 255)
