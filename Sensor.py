@@ -44,7 +44,7 @@ class Sensor:
             self.direction_vector = self.find_closest_intersection(self.root_vector, intersections)
             self.collision_detected = True
 
-        self.length = math.sqrt((self.direction_vector[1] - self.root_vector[1])**2 + (self.direction_vector[1] - self.root_vector[1])**2)
+        self.length = math.sqrt((self.direction_vector[1] - self.root_vector[1])**2 + (self.direction_vector[0] - self.root_vector[0])**2)
 
         return self.root_vector, self.direction_vector, self.collision_detected, self.length
 
