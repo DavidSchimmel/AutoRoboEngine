@@ -21,10 +21,19 @@ class Sensor:
         self.update_explicit(self.anchor_position, self.anchor_distance, self.angle, self.range, environment)
 
     def update_explicit(self, anchor_position, anchor_distance, angle, sensor_range, environment):
+        epsilon = 1
         orientation_normalized = (math.cos(angle), math.sin(angle))
 
         root_vector      = [orientation_normalized[0] * anchor_distance,                  orientation_normalized[1] * anchor_distance]
         direction_vector = [orientation_normalized[0] * (sensor_range + anchor_distance), orientation_normalized[1] * (sensor_range + anchor_distance)]
+
+        # include error margin for very close obstacles
+        epsilon_x_signum = -1 if root_vector[0] > 0 else 1
+        epsilon_y_signum = -1 if root_vector[1] > 0 else 1
+        root_vector[0] = root_vector[0] + (epsilon_x_signum * epsilon)
+        root_vector[1] = root_vector[1] + (epsilon_y_signum * epsilon)
+        direction_vector[0] = direction_vector[0] + (epsilon_x_signum * epsilon)
+        direction_vector[1] = direction_vector[1] + (epsilon_y_signum * epsilon)
 
         self.root_vector      = [anchor_position[0] + root_vector[0],      anchor_position[1] + root_vector[1]]
         self.direction_vector = [anchor_position[0] + direction_vector[0], anchor_position[1] + direction_vector[1]]
