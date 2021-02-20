@@ -1,6 +1,9 @@
 import math
 
 class Config:
+    # general
+    DEBUG = True
+
     # Board
     BOARD_SIZE = BOARD_WIDTH, BOARD_HEIGHT = 1024, 760
     # FRAMES_PER_SECOND = 30

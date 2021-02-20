@@ -2,6 +2,7 @@ import sys, pygame
 from pygame.draw import circle
 from Config import Config
 import Constants as C
+import Debug
 from Robot import Robot
 from collision_managment import create_environment, render_environment
 
@@ -47,5 +48,10 @@ while 1:
 
     render_environment(screen, pygame, env)
     render(robot, [])
+    if (config.DEBUG):
+        Debug.print_debug_info(screen, "v left: {:0.3f}".format(robot.velocity_left), (robot.position[0], robot.position[1] - 10))
+        Debug.print_debug_info(screen, "v right: {:0.3f}".format(robot.velocity_right), (robot.position[0], robot.position[1] + 10))
+        for sensor in robot.sensors:
+            Debug.print_debug_info(screen, "L: {:0.0f}".format(sensor.length), (sensor.direction_vector[0], sensor.direction_vector[1] - 10))
 
     pygame.display.flip()

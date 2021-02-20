@@ -10,6 +10,7 @@ class Sensor:
         self.colour             = colour
         self.root_vector        = []
         self.direction_vector   = []
+        self.length             = sensor_range
         self.collision_detected = False
 
         self.update(environment)
@@ -34,7 +35,9 @@ class Sensor:
             self.direction_vector = self.find_closest_intersection(self.root_vector, intersections)
             self.collision_detected = True
 
-        return self.root_vector, self.direction_vector, self.collision_detected
+        self.length = math.sqrt((self.direction_vector[1] - self.root_vector[1])**2 + (self.direction_vector[1] - self.root_vector[1])**2)
+
+        return self.root_vector, self.direction_vector, self.collision_detected, self.length
 
     def shift_to(self, anchor_position):
         self.anchor_position = anchor_position
