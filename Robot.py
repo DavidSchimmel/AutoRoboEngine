@@ -56,18 +56,18 @@ class Robot:
             velocity = (self.velocity_right + self.velocity_left) / 2
             x_updated = self.position[0] + velocity * orientation[0] * delta_t
             y_updated = self.position[1] + velocity * orientation[1] * delta_t
-            if(resolve_collision((x_updated, y_updated), self.size, self.environment, self.environment_size)):
+            if(resolve_collision((self.position[0], self.position[1]),(x_updated, y_updated), self.size, self.environment, self.environment_size)):
                 t=0
                 x_updated = self.position[0]
                 y_updated = self.position[1]
-                while(t<delta_t and not resolve_collision((x_updated + velocity * orientation[0] * microstep, y_updated + velocity * orientation[1] * microstep), self.size, self.environment, self.environment_size)):
+                while(t<delta_t and not resolve_collision((x_updated, y_updated), (x_updated + velocity * orientation[0] * microstep, y_updated + velocity * orientation[1] * microstep), self.size, self.environment, self.environment_size)):
                     x_updated = x_updated + velocity * orientation[0] * microstep
                     y_updated = y_updated + velocity * orientation[1] * microstep
                     t+=microstep
                 while(t<delta_t): #translation
-                    if not resolve_collision((x_updated + velocity * orientation[0] * microstep, y_updated), self.size, self.environment, self.environment_size):
+                    if not resolve_collision((x_updated, y_updated), (x_updated + velocity * orientation[0] * microstep, y_updated), self.size, self.environment, self.environment_size):
                         x_updated=x_updated + velocity * orientation[0] * microstep
-                    if not resolve_collision((x_updated, y_updated + velocity * orientation[1] * microstep), self.size, self.environment, self.environment_size):
+                    if not resolve_collision((x_updated, y_updated), (x_updated, y_updated + velocity * orientation[1] * microstep), self.size, self.environment, self.environment_size):
                         y_updated=y_updated + velocity * orientation[1] * microstep
                     t+=microstep
 
@@ -86,14 +86,14 @@ class Robot:
 
         rotation = omega * delta_t
 
-        if(resolve_collision((x_updated, y_updated), self.size, self.environment, self.environment_size)):
+        if(resolve_collision((self.position[0], self.position[1]), (x_updated, y_updated), self.size, self.environment, self.environment_size)):
             t=0
             angle = self.angle
             x_updated = self.position[0]
             y_updated = self.position[1]
             x_updated_  = math.cos(omega * microstep) * (x_updated - ICC_x) - math.sin(omega * microstep) * (y_updated - ICC_y) + ICC_x
             y_updated_  = math.sin(omega * microstep) * (x_updated - ICC_x) + math.cos(omega * microstep) * (y_updated - ICC_y) + ICC_y
-            while(t<delta_t and not resolve_collision( (x_updated_, y_updated_ ), self.size, self.environment, self.environment_size)):
+            while(t<delta_t and not resolve_collision((x_updated, y_updated), (x_updated_, y_updated_ ), self.size, self.environment, self.environment_size)):
                 x_updated=x_updated_
                 y_updated=y_updated_
                 x_updated_  = math.cos(omega * microstep) * (x_updated - ICC_x) - math.sin(omega * microstep) * (y_updated - ICC_y) + ICC_x
@@ -106,9 +106,9 @@ class Robot:
             orientation = self.get_orientation_vector(self.angle, 1)
             velocity = (self.velocity_right + self.velocity_left) / 2
             while(t<delta_t): #translation
-                if not resolve_collision((x_updated + velocity * orientation[0] * microstep, y_updated), self.size, self.environment, self.environment_size):
+                if not resolve_collision((x_updated, y_updated), (x_updated + velocity * orientation[0] * microstep, y_updated), self.size, self.environment, self.environment_size):
                     x_updated=x_updated + velocity * orientation[0] * microstep
-                if not resolve_collision((x_updated, y_updated + velocity * orientation[1] * microstep), self.size, self.environment, self.environment_size):
+                if not resolve_collision((x_updated, y_updated), (x_updated, y_updated + velocity * orientation[1] * microstep), self.size, self.environment, self.environment_size):
                     y_updated=y_updated + velocity * orientation[1] * microstep
                 t+=microstep
 

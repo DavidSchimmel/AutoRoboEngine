@@ -24,17 +24,23 @@ def render_environment(screen, pg, ob_list): #print the environment on the scree
         elif o[0]=='c':
             pg.draw.circle(screen, obstacle_color, o[1], o[2])
 
-def collision_rect(c, radius, r): #detect a collision with a rectangular obstacle
+def collision_rect(c_start, c, radius, r): #detect a collision with a rectangular obstacle
    left=r[0]
    top=r[1]
    right=left+r[2]
    bottom=top+r[3]
+   #check if I'm too close to the obstacle (I'm touching it)
    closestX = left if c[0] < left else (right if c[0] > right else c[0])
    closestY = top if c[1] < top else (bottom if c[1] > bottom else c[1])
    dx = closestX - c[0]
    dy = closestY - c[1]
    if dx==0 and dy==0: return True
    if ( dx * dx + dy * dy ) < radius * radius: return True
+   #check if I've jumped the obstacle in one step
+   if (get_line_intersection( (c_start,c), ((left, top),(right, top)) )): return True
+   if (get_line_intersection( (c_start,c), ((left, bottom),(right, bottom)) )): return True
+   if (get_line_intersection( (c_start,c), ((left, top),(left, bottom)) )): return True
+   if (get_line_intersection( (c_start,c), ((right, top),(right, bottom)) )): return True
    return False
 
 def collision_circle(c, r, C, R): #detect a collision with a circular obstacle
@@ -46,10 +52,10 @@ def collision_circle(c, r, C, R): #detect a collision with a circular obstacle
     return False
 
 
-def resolve_collision(s, robot_R, ob_list, size): #scan each obstacle in the environment and return True if there is a collision
+def resolve_collision(start, s, robot_R, ob_list, size): #scan each obstacle in the environment and return True if there is a collision
     for ob in ob_list:
         if ob[0] == 'r':
-            if (collision_rect(s, robot_R, ob[1])):
+            if (collision_rect(start, s, robot_R, ob[1])):
                 return True
         if ob[0] == 'c':
             if (collision_circle(s, robot_R, ob[1], ob[2])):
