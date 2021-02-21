@@ -5,7 +5,7 @@ import math
 
 config = Config()
 
-#**** Environment obstacles and collisions recovery ****#
+#**** Environment obstacles and collisions detection ****#
 def create_environment(size, N_obstacle): #create a N_obstacle (random shape, position and dimension) obstacles in the environment
     obstacle_list=[]
     for o in range(N_obstacle):
@@ -24,7 +24,7 @@ def render_environment(screen, pg, ob_list): #print the environment on the scree
         elif o[0]=='c':
             pg.draw.circle(screen, obstacle_color, o[1], o[2])
 
-def collision_rect(c, radius, r):
+def collision_rect(c, radius, r): #detect a collision with a rectangular obstacle
    left=r[0]
    top=r[1]
    right=left+r[2]
@@ -37,7 +37,7 @@ def collision_rect(c, radius, r):
    if ( dx * dx + dy * dy ) < radius * radius: return True
    return False
 
-def collision_circle(c, r, C, R):
+def collision_circle(c, r, C, R): #detect a collision with a circular obstacle
     dx = c[0] - C[0]
     dy = c[1] - C[1]
     dr = r + R
@@ -46,7 +46,7 @@ def collision_circle(c, r, C, R):
     return False
 
 
-def resolve_collision(s, robot_R, ob_list, size):
+def resolve_collision(s, robot_R, ob_list, size): #scan each obstacle in the environment and return True if there is a collision
     for ob in ob_list:
         if ob[0] == 'r':
             if (collision_rect(s, robot_R, ob[1])):
@@ -57,7 +57,9 @@ def resolve_collision(s, robot_R, ob_list, size):
     if s[0]<robot_R or s[0]>size[0]-robot_R or s[1]<0 or s[1]>size[1]-robot_R: return True
     return False
 
-def find_intersection(root_vector, direction_vector, radius, obstacle_list):
+#**** Sensors obstacles collision ****#
+
+def find_intersection(root_vector, direction_vector, radius, obstacle_list): #find a possible intersection with an obstacle
     intersections = []
 
     for obstacle in obstacle_list:
@@ -84,8 +86,7 @@ def find_intersection(root_vector, direction_vector, radius, obstacle_list):
 
     return intersections
 
-
-def get_line_intersection(line1, line2):
+def get_line_intersection(line1, line2): #get the intersection between two 2D lines
     xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
     ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
 
@@ -105,7 +106,7 @@ def get_line_intersection(line1, line2):
 
     return None
 
-def check_range(x, y, start_point, end_point):
+def check_range(x, y, start_point, end_point): #prevent misclarification in the sensor when a collision contact point is exactly in the same position
     epsilon = 0.0000001
     if x + epsilon < min(start_point[0], end_point[0]): return False
     if x - epsilon > max(start_point[0], end_point[0]): return False
