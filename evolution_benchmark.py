@@ -10,8 +10,8 @@ class evolution_benchmark():
         self.num_pop = num_pop #Number of individuals in population
         self.fit = np.zeros(num_pop) #evaluation/fit for each indivial
         self.num_gen = num_gen #Number of generations
-        self.mutation_rate = 0.95 #Probability that a mutation occour, Xover and Mutation have the same probability
-        self.n_best = math.floor(num_pop*0.75) #Number of best individuals allowed to reproduce (where required)
+        self.mutation_rate = 0.5 #Probability that a mutation occour, Xover and Mutation have the same probability
+        self.n_best = math.floor(num_pop*0.25) #Number of best individuals allowed to reproduce (where required)
         self.mutation_coef = 0.01 #Magnitude of the mutation
 
     def _create_individual(self, mode='uni_sampled'):
@@ -51,7 +51,7 @@ class evolution_benchmark():
             for i in range(n_best,len(self.population)):
                 if (k >= n_best):
                     k = 0
-                if (random.random() > 0.7):
+                if (random.random() > 0.75):
                     new_population.append(self.population[k].copy())
                     k += 1
                 else:
@@ -179,6 +179,12 @@ positions=np.array(positions)
 ln, = plt.plot([], [], 'ro')
 def update(f): #Frame's update
     print(f)
+    plt.text(2, 3, r'type: elitism', fontsize=12)
+    plt.text(2, 4, r'survival rate: 0.75', fontsize=12)
+    plt.text(2, 5, r'elite rate: 0.25', fontsize=12)
+    plt.text(2, 6, r'mutation rate: 0.25', fontsize=12)
+    plt.text(2, 7, r'population count: 50', fontsize=12)
+    plt.text(2, 8, r'generations: 30', fontsize=12)
     ln.set_data(positions[0][f], positions[1][f])
     return ln,
 
