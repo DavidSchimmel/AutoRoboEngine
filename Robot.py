@@ -2,25 +2,28 @@ from pygame.draw import (circle, aaline)
 import math
 from collision_managment import resolve_collision
 from Sensor import Sensor
+from Controller import Controller
 
 class Robot:
     def __init__(self, config, pygame, display, display_size, environment, colour, position, angle_degree, size = 10):
         self.LEFT = "left"
         self.RIGHT = "right"
 
-        self.config         = config
+        self.config           = config
 
-        self.game           = pygame
-        self.display        = display
-        self.environment    = environment
+        self.game             = pygame
+        self.display          = display
+        self.environment      = environment
         self.environment_size = display_size
 
-        self.velocity_left  = 0
-        self.velocity_right = 0
-        self.angle          = math.radians(angle_degree)
-        self.position       = position
-        self.colour         = colour
-        self.size           = size
+        self.controller       = Controller(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH)
+
+        self.velocity_left    = 0
+        self.velocity_right   = 0
+        self.angle            = math.radians(angle_degree)
+        self.position         = position
+        self.colour           = colour
+        self.size             = size
 
         self.sensors = self.initialize_sensors(self.config.SENSOR_COUNT, angle_degree, self.config.SENSOR_RANGE, self.config.SENSOR_COLOUR, environment)
         self.check_sensors()
@@ -136,6 +139,7 @@ class Robot:
         return self.angle
 
     def acellarate(self, side, increment):
+        # TODO Check max speed if you use it
         if side   == self.LEFT:
             self.velocity_left  += self.config.ACCELERATION * increment
         elif side == self.RIGHT:

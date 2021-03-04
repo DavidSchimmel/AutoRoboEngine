@@ -12,7 +12,7 @@ pygame.init()
 
 size = width, height = config.BOARD_SIZE
 speed = [2, 2]
-
+DEBUG = 0
 screen = pygame.display.set_mode(size)
 
 env=create_environment(size, 4) #create an environment with 4 obstacles
@@ -26,7 +26,7 @@ while 1: #simulation loop
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
-        if event.type == pygame.KEYDOWN:
+        if config.KEYBOARD_MOVEMENT==1 and event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w:
                 robot.acellarate(robot.LEFT,   1)
             elif event.key == pygame.K_o:
@@ -43,6 +43,14 @@ while 1: #simulation loop
                 robot.acellarate(robot.RIGHT, -1)
             elif event.key == pygame.K_x:
                 robot.stop()
+
+    # calculate movement per controller
+    DEBUG +=1
+    directions = robot.controller.process(robot.sensors)
+    robot.acellarate(robot.LEFT, directions[0])
+    robot.acellarate(robot.RIGHT, directions[1])
+    robot.controller.velocity_queue.put([robot.velocity_left, robot.velocity_right])
+
 
     #execute a robot's movement checking the collisions
     robot.move()
