@@ -18,7 +18,7 @@ def create_environment(size, N_obstacle): #create a N_obstacle (random shape, po
         obstacle_list.append(('r', (0, 0, size[0], 2)))
         obstacle_list.append(('r', (0, 0, 2, size[1])))
         obstacle_list.append(('r', (0, size[1]-2, size[0], size[1])))
-        obstacle_list.append(('r', (size[0]-2, size[0], size[0], size[1])))
+        obstacle_list.append(('r', (size[0]-2, 0, size[0], size[1])))
     return obstacle_list
 
 def render_environment(screen, pg, ob_list): #print the environment on the screen

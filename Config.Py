@@ -2,7 +2,7 @@ import math
 
 class Config:
     # general
-    DEBUG = True
+    DEBUG = False
     SHOW = "ALL" #[ALL, BEST, NONE]
     SHOW_INCREMENT_DISTANCE = 10 # number of generations for saving
     KEYBOARD_MOVEMENT = 0 # 0=prohibited, 1=permitted
@@ -25,5 +25,6 @@ class Config:
 
     # Evolutionary Algorithm
     POPULATION_SIZE = 10
+    GENERATION_DURATION = 600
     GENERATION_COUNT = 50
     VELOCITY_QUEUE_LENGTH = 30

@@ -53,7 +53,7 @@ class Robot:
 
     def move(self):
         delta_t = 1
-        microstep = 0.01
+        microstep = 0.05
         if self.velocity_left == self.velocity_right:
             orientation = self.get_orientation_vector(self.angle, 1)
             velocity = (self.velocity_right + self.velocity_left) / 2
@@ -175,3 +175,9 @@ class Robot:
             if (sensor.collision_detected):
                 colour = (222, 70, 10)
             self.game.draw.aaline(self.display, colour, sensor.root_vector, sensor.direction_vector)
+
+    def controller_process(self):
+        directions = self.controller.process(self.sensors)
+        self.acellarate(self.LEFT, directions[0])
+        self.acellarate(self.RIGHT, directions[1])
+        self.controller.velocity_queue.put([self.velocity_left, self.velocity_right])
