@@ -5,7 +5,7 @@ from Sensor import Sensor
 from Controller import Controller
 
 class Robot:
-    def __init__(self, config, pygame, display, display_size, environment, colour, position, angle_degree, size = 10):
+    def __init__(self, config, pygame, display, display_size, environment, colour, position, angle_degree, size, controller_init):
         self.LEFT = "left"
         self.RIGHT = "right"
 
@@ -16,7 +16,8 @@ class Robot:
         self.environment      = environment
         self.environment_size = display_size
 
-        self.controller       = Controller(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH)
+        self.controller_init  = controller_init
+        self.controller       = Controller(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH, self.controller_init)
 
         self.velocity_left    = 0
         self.velocity_right   = 0

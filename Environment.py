@@ -52,8 +52,9 @@ def simulate_episode(population):
     black_board = []
     fitness = []
     norm_term = width*height
+    #initialization, we can put it outside if we want to mantain active the pygame instance
     for k in range (config.POPULATION_SIZE):
-        robot = Robot(config, pygame, screen, size, env, C.ROBOT_CYAN, [400, 400], 90 , 25) #add parameter population[k] = weights for its nn
+        robot = Robot(config, pygame, screen, size, env, C.ROBOT_CYAN, [400, 400], 90 , 25, population[k]) #add parameter population[k] = weights for its nn
         agents.append(robot)
         black_board.append(np.zeros(size, dtype='bool'))
         fitness.append(0)
