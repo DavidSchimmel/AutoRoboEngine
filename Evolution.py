@@ -6,7 +6,6 @@ class Evolution():
         self.weights_bounds =[[-10,10],[10,10]]
         self.nn_layer_list = nn_layer_list
 
-
     def _create_individual(self, mode='uni_sampled'):
         genotype = []
         for l in range(len(self.nn_layer_list)-1):
