@@ -1,10 +1,11 @@
+#David
 import math
 import numpy as np
 import queue
 import random
 
 class Controller:
-    def __init__(self, speed_normalizer, number_of_sensors, velocity_queue_length):
+    def __init__(self, speed_normalizer, number_of_sensors, velocity_queue_length, weights_init):
         self.speed_normalizer = speed_normalizer
         self.weights          = 2 * (np.random.rand(number_of_sensors + 2 + 1, 2) - 0.5) # initialize weights with random uniform distribution between -1 and 1
         self.velocity_queue   = queue.SimpleQueue()

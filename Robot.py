@@ -1,3 +1,4 @@
+#Simone and David
 from pygame.draw import (circle, aaline)
 import math
 from collision_managment import resolve_collision
@@ -5,7 +6,7 @@ from Sensor import Sensor
 from Controller import Controller
 
 class Robot:
-    def __init__(self, config, pygame, display, display_size, environment, colour, position, angle_degree, size = 10):
+    def __init__(self, config, pygame, display, display_size, environment, colour, position, angle_degree, size, controller_init):
         self.LEFT = "left"
         self.RIGHT = "right"
 
@@ -16,7 +17,8 @@ class Robot:
         self.environment      = environment
         self.environment_size = display_size
 
-        self.controller       = Controller(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH)
+        self.controller_init  = controller_init
+        self.controller       = Controller(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH, self.controller_init)
 
         self.velocity_left    = 0
         self.velocity_right   = 0
@@ -52,6 +54,7 @@ class Robot:
         return orientation_vector
 
     def move(self):
+        col_detected=False
         delta_t = 1
         microstep = 0.05
         if self.velocity_left == self.velocity_right:
@@ -60,6 +63,7 @@ class Robot:
             x_updated = self.position[0] + velocity * orientation[0] * delta_t
             y_updated = self.position[1] + velocity * orientation[1] * delta_t
             if(resolve_collision((self.position[0], self.position[1]),(x_updated, y_updated), self.size, self.environment, self.environment_size)):
+                col_detected=True
                 t=0
                 x_updated = self.position[0]
                 y_updated = self.position[1]
@@ -76,7 +80,7 @@ class Robot:
 
             self.update_position(x_updated, y_updated)
 
-            return self.position
+            return self.position, col_detected
 
         omega = (self.velocity_right - self.velocity_left) / self.size
         R = (self.size / 2) * (self.velocity_right + self.velocity_left) / (self.velocity_right - self.velocity_left)
@@ -90,6 +94,7 @@ class Robot:
         rotation = omega * delta_t
 
         if(resolve_collision((self.position[0], self.position[1]), (x_updated, y_updated), self.size, self.environment, self.environment_size)):
+            col_detected=True
             t=0
             angle = self.angle
             x_updated = self.position[0]
@@ -118,7 +123,7 @@ class Robot:
         self.update_position(x_updated, y_updated)
         self.rotate(rotation)
 
-        return self.position
+        return self.position, col_detected #(self.position, 
 
 
     def update_position(self, x, y):
