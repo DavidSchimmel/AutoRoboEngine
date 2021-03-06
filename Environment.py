@@ -1,3 +1,4 @@
+#Simone and David
 import sys, pygame
 from pygame.draw import circle
 import multiprocessing as mp

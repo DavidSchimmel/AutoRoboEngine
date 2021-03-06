@@ -1,3 +1,4 @@
+#Simone and David
 from pygame.draw import (circle, aaline)
 import math
 from collision_managment import resolve_collision

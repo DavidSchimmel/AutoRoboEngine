@@ -1,3 +1,4 @@
+#Simone
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -17,14 +18,14 @@ else:
 
 class Evolution():
 
-    def __init__(self, nn_layer_list):
+    def __init__(self, nn_layer_list, num_pop=10, num_gen=10, mutation_rate=0.2, n_best=3):
         self.weights_bounds =[-1000,1000] #initial weight bounds
         self.nn_layer_list = nn_layer_list
 
-        self.num_pop = 100
-        self.num_gen = 20
-        self.mutation_rate = 1 #probability of a mutation
-        self.n_best = 3
+        self.num_pop = num_pop
+        self.num_gen = num_gen
+        self.mutation_rate = mutation_rate #probability of a mutation
+        self.n_best = n_best
 
         self.h_fmax=[]
         self.h_favg=[]
