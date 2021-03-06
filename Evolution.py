@@ -1,16 +1,19 @@
 import numpy as np
-#from Environment import *
 import random
 import matplotlib.pyplot as plt
 
-def simulate_episode(population):
-    fit = []
-    for m in  range(len(population)):
-        tmp = 0
-        for n in range(len(population[m])):
-            tmp += np.sum(population[m][n])
-        fit.append(tmp)
-    return fit
+DEBUG = True
+if DEBUG:
+    def simulate_episode(population): #stupid function that only return the sum of all the elements of all the matrixes
+        fit = []
+        for m in  range(len(population)):
+            tmp = 0
+            for n in range(len(population[m])):
+                tmp += np.sum(population[m][n])
+            fit.append(tmp)
+        return fit
+else:
+    from Environment import *
 
 class Evolution():
 
@@ -18,8 +21,8 @@ class Evolution():
         self.weights_bounds =[-1000,1000] #initial weight bounds
         self.nn_layer_list = nn_layer_list
 
-        self.num_pop = 10
-        self.num_gen = 10
+        self.num_pop = 100
+        self.num_gen = 20
         self.mutation_rate = 1 #probability of a mutation
         self.n_best = 3
 
@@ -109,6 +112,12 @@ class Evolution():
         for g in range(self.num_gen):
             self.evaluation()
             self.population = self.selection_reproduction(mode='elitism', n_best=self.n_best)
+
+            if verbose: print('Generation ',g,' Best: ',self.population[0],' with value: ', self.fit[0])
+            self.h_fmax.append(self.fit[0])
+            self.h_favg.append(sum(self.fit)/len(self.fit))
+            self.h_div.append(self.diversity())
+
             start = 0 if not mantain_best else self.n_best
             for p in range(start, self.num_pop):
                 if random.random()<self.mutation_rate:
@@ -116,12 +125,7 @@ class Evolution():
                         self.population[p] = self.Xover(self.population[p], self.population[random.randint(0, self.num_pop-1)], mode=random.randint(0, 2))
                     else:
                         self.population[p] = self.mutation(self.population[p])
-            
-            if verbose: print('Generation ',g,' Best: ',self.population[0],' with value: ', self.fit[0])
-            self.h_fmax.append(self.fit[0])
-            self.h_favg.append(sum(self.fit)/len(self.fit))
-            self.h_div.append(self.diversity())
-
+        
     def diversity(self):
         tmp = 0
         for i in range(self.num_pop):
@@ -132,15 +136,19 @@ class Evolution():
  
 
 if __name__=='__main__':
+    #Run 1 experiment and show the results
     ea = Evolution([2,3,4,2])
     ea.evolution(verbose=False)
     plt.figure()
     plt.title('Max fitness')
     plt.plot(ea.h_fmax)
+    plt.show()
     plt.figure('Avg fitness')
     plt.plot(ea.h_favg)
+    plt.show()
     plt.figure('Diversity')
     plt.plot(ea.h_div)
+    plt.show()
   
     
     
