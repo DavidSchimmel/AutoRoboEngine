@@ -43,7 +43,6 @@ class Evolution():
         self.population = []
         for _ in range(self.num_pop):
             self.population.append(self._create_individual(mode))
-        print('Population inizialized')
 
     def evaluation(self):
         self.fit = simulate_episode(self.population)
