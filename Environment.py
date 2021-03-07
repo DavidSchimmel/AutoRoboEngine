@@ -23,7 +23,7 @@ def process_agent(agent, board, fitness, a):
     #execute a robot's movement checking the collisions
     _, collision = agent.move()
     if collision:
-        fitness[a] = -2
+        fitness[a] = Config.COLLISION_VAL
     clear_room(agent.position, Config.BALL_SIZE, board)
     #update the sensors' measurement
     agent.check_sensors()
@@ -98,7 +98,7 @@ def simulate_episode(population):
             #temp = [pool.apply(process_agent, args=(agent)) for agent in agents]
             #pool.map(process_agent, [agent for agent in agents])
             for a in range(len(agents)):
-                if (fitness[a]!=-2): #If my agent hasn't already collided
+                if (fitness[a]!=Config.COLLISION_VAL): #If my agent hasn't already collided
                     process_agent(agents[a], black_board[a], fitness, a)
 
             render_environment(screen, pygame, env)
