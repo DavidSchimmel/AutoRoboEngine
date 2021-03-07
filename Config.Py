@@ -33,5 +33,5 @@ class Config:
     MUTATION_RATE = 0.1 
     N_BEST = 3
     NN_LAYER_NODES = [15,2]
-    COLLISION_VAL = -1 #penalty given for a collision
+    COLLISION_VAL = -0.5 #penalty given for a collision
     
