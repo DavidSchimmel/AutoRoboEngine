@@ -2,8 +2,9 @@
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+from Config import *
 
-DEBUG = True
+DEBUG = False
 if DEBUG:
     def simulate_episode(population): #stupid function that only return the sum of all the elements of all the matrixes
         fit = []
@@ -18,14 +19,14 @@ else:
 
 class Evolution():
 
-    def __init__(self, nn_layer_list, num_pop=10, num_gen=10, mutation_rate=0.2, n_best=3):
-        self.weights_bounds =[-1000,1000] #initial weight bounds
-        self.nn_layer_list = nn_layer_list
+    def __init__(self, nn_layer_list):
+        self.weights_bounds =[-1,1] #initial weight bounds
+        self.nn_layer_list = Config.NN_LAYER_NODES
 
-        self.num_pop = num_pop
-        self.num_gen = num_gen
-        self.mutation_rate = mutation_rate #probability of a mutation
-        self.n_best = n_best
+        self.num_pop = Config.POPULATION_SIZE
+        self.num_gen = Config.NUM_GENERATION
+        self.mutation_rate = Config.MUTATION_RATE #probability of a mutation
+        self.n_best = Config.N_BEST
 
         self.h_fmax=[]
         self.h_favg=[]
@@ -120,11 +121,9 @@ class Evolution():
 
             start = 0 if not mantain_best else self.n_best
             for p in range(start, self.num_pop):
+                self.population[p] = self.Xover(self.population[p], self.population[random.randint(0, self.num_pop-1)], mode=random.randint(0, 2))
                 if random.random()<self.mutation_rate:
-                    if random.random()<0.5:
-                        self.population[p] = self.Xover(self.population[p], self.population[random.randint(0, self.num_pop-1)], mode=random.randint(0, 2))
-                    else:
-                        self.population[p] = self.mutation(self.population[p])
+                    self.population[p] = self.mutation(self.population[p])
         
     def diversity(self):
         tmp = 0

@@ -15,6 +15,7 @@ exp_h_favg=[]
 exp_h_div=[]
 
 if __name__=='__main__':
+    
     for e in range(num_experiments):
         ea = Evolution(nn_layer)
         ea.evolution(verbose=False)
