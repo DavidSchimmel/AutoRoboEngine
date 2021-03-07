@@ -37,7 +37,7 @@ def clear_room(c, R, blackboard):
         for y in range( round(-R*sqrt(1-x*x/(R*R))) , round(R*sqrt(1-x*x/(R*R))) ):
             blackboard[ min(blackboard.shape[0]-1, max(0, cx+x)) ][ min(blackboard.shape[1]-1, max(0, cy+y)) ]=1
 
-def simulate_episode(population):
+def simulate_episode(population, show_graphically, generation_counter):
     #population = list of genotype = weights
     config = Config()
     pygame.init()
@@ -55,7 +55,17 @@ def simulate_episode(population):
     norm_term = width*height
     #initialization, we can put it outside if we want to mantain active the pygame instance
     for k in range (config.POPULATION_SIZE):
-        robot = Robot(config, pygame, screen, size, env, C.ROBOT_CYAN, [400, 400], 90 , 25, population[k]) #add parameter population[k] = weights for its nn
+        robot = Robot(config, \
+                pygame, \
+                screen, \
+                size, \
+                env, \
+                C.ROBOT_CYAN, \
+                [400, 400], \
+                90, \
+                config.BALL_SIZE, \
+                config.MAX_VELOCITY, \
+                population[k]) #add parameter population[k] = weights for its nn
         agents.append(robot)
         black_board.append(np.zeros(size, dtype='bool'))
         fitness.append(0)
@@ -99,7 +109,6 @@ def simulate_episode(population):
         render_environment(screen, pygame, env)
 
         #update the graphical representation
-        render(config, agents)
 
         #if we are working in DEBUG mode, we can see the labels with the sensors' measurement and the robot speed
         if (config.DEBUG):
@@ -109,11 +118,14 @@ def simulate_episode(population):
                 for sensor in agent.sensors:
                     Debug.print_debug_info(screen, "L: {:0.0f}".format(sensor.length), (sensor.direction_vector[0], sensor.direction_vector[1] - 10))
 
-        pygame.display.flip()
+        if (show_graphically):
+            render(config, agents)
+            Debug.print_debug_info(screen, "Generation: {:0.3f}".format(generation_counter), (30, 10))
+            pygame.display.flip()
     #finish of the time
     #count board and add the value
     for a in range(len(agents)):
-            fitness[a] += np.count_nonzero(black_board[a])/norm_term
+        fitness[a] += np.count_nonzero(black_board[a])/norm_term
     # pool.close()
     return fitness
 

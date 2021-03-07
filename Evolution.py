@@ -2,8 +2,9 @@
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+from Config import Config
 
-DEBUG = True
+DEBUG = False
 if DEBUG:
     def simulate_episode(population): #stupid function that only return the sum of all the elements of all the matrixes
         fit = []
@@ -17,36 +18,38 @@ else:
     from Environment import *
 
 class Evolution():
+    def __init__(self, nn_layer_list, num_pop=None, num_gen=None, mutation_rate=None, n_best=3):
+        self.config         = Config()
 
-    def __init__(self, nn_layer_list, num_pop=10, num_gen=10, mutation_rate=0.2, n_best=3):
-        self.weights_bounds =[-1000,1000] #initial weight bounds
-        self.nn_layer_list = nn_layer_list
+        self.weights_bounds = self.config.INITIAL_WEIGHT_RANGE #initial weight bounds
+        self.nn_layer_list  = nn_layer_list
 
-        self.num_pop = num_pop
-        self.num_gen = num_gen
-        self.mutation_rate = mutation_rate #probability of a mutation
-        self.n_best = n_best
+        self.num_pop        = num_pop if num_pop != None else self.config.POPULATION_SIZE
+        self.num_gen        = num_gen if num_gen != None else self.config.GENERATION_COUNT
+        self.mutation_rate  = mutation_rate if mutation_rate != None else self.config.MUTATION_RATE
+        self.n_best         = n_best
 
-        self.h_fmax=[]
-        self.h_favg=[]
-        self.h_div=[]
+        self.h_fmax         = []
+        self.h_favg         = []
+        self.h_div          = []
 
     def _create_individual(self, mode='std_sampled'):
         genotype = []
         for l in range(len(self.nn_layer_list)-1):
             if mode == 'std_sampled':
-                genotype.append(np.random.normal(0,1000,size=(self.nn_layer_list[l], self.nn_layer_list[l+1]))) #probably better
+                genotype.append(np.random.normal(self.weight_bounds[0], self.weight_bounds[1], size=(self.nn_layer_list[l], self.nn_layer_list[l+1]))) #probably better
             elif mode == 'uni_sampled':
                 genotype.append(np.multiply(np.random.uniform(size=(self.nn_layer_list[l], self.nn_layer_list[l+1])), self.weights_bounds[1]-self.weights_bounds[0])+self.weights_bounds[0])
         return genotype
 
-    def initialization(self, mode='std_sampled'):
+    def initialization(self, mode='uni_sampled'):
         self.population = []
         for _ in range(self.num_pop):
             self.population.append(self._create_individual(mode))
 
-    def evaluation(self):
-        self.fit = simulate_episode(self.population)
+    def evaluation(self, generation_counter):
+        show_graphically = (generation_counter % self.config.SHOW_INCREMENT_DISTANCE) == 0
+        self.fit = simulate_episode(self.population, show_graphically, generation_counter)
         #Ordered population
         tmp = sorted(zip(self.population, self.fit), reverse=True, key = lambda a : a[1])
         self.population = [x[0] for x in tmp]
@@ -109,11 +112,11 @@ class Evolution():
 
     def evolution(self, verbose=True, mantain_best=True):
         self.initialization()
-        for g in range(self.num_gen):
-            self.evaluation()
+        for generation_counter in range(self.num_gen):
+            self.evaluation(generation_counter)
             self.population = self.selection_reproduction(mode='elitism', n_best=self.n_best)
 
-            if verbose: print('Generation ',g,' Best: ',self.population[0],' with value: ', self.fit[0])
+            if verbose: print('Generation ',generation_counter,' Best: ',self.population[0],' with value: ', self.fit[0])
             self.h_fmax.append(self.fit[0])
             self.h_favg.append(sum(self.fit)/len(self.fit))
             self.h_div.append(self.diversity())
@@ -125,19 +128,19 @@ class Evolution():
                         self.population[p] = self.Xover(self.population[p], self.population[random.randint(0, self.num_pop-1)], mode=random.randint(0, 2))
                     else:
                         self.population[p] = self.mutation(self.population[p])
-        
+
     def diversity(self):
         tmp = 0
         for i in range(self.num_pop):
             for j in range(i, self.num_pop):
                 for m in range(len(self.population[i])):
-                    tmp += np.average(np.power(self.population[i][m]-self.population[j][m],2)) 
+                    tmp += np.average(np.power(self.population[i][m]-self.population[j][m],2))
         return tmp
- 
+
 
 if __name__=='__main__':
     #Run 1 experiment and show the results
-    ea = Evolution([2,3,4,2])
+    ea = Evolution([15, 2])
     ea.evolution(verbose=False)
     plt.figure()
     plt.title('Max fitness')
@@ -149,6 +152,3 @@ if __name__=='__main__':
     plt.figure('Diversity')
     plt.plot(ea.h_div)
     plt.show()
-  
-    
-    

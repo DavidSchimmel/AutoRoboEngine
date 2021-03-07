@@ -1,8 +1,11 @@
 #Simone
 from Evolution import *
+from Config import Config
 
-num_experiments = 10
-nn_layer = [2,3,3,2]
+config = Config()
+
+
+nn_layer = [19, 6, 2]
 
 def preprocessing_data(x):
     avg = np.average(x, axis=0)
@@ -15,7 +18,7 @@ exp_h_favg=[]
 exp_h_div=[]
 
 if __name__=='__main__':
-    for e in range(num_experiments):
+    for e in range(config.NUMBER_OF_EXPERIMENTS):
         ea = Evolution(nn_layer)
         ea.evolution(verbose=False)
         exp_h_fmax.append(ea.h_fmax)

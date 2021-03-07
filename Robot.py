@@ -4,28 +4,31 @@ import math
 from collision_managment import resolve_collision
 from Sensor import Sensor
 from Controller import Controller
+from Controller_2 import Controller_2
 
 class Robot:
-    def __init__(self, config, pygame, display, display_size, environment, colour, position, angle_degree, size, controller_init):
+    def __init__(self, config, pygame, display, display_size, environment, colour, position, angle_degree, size, max_velocity, controller_weights):
         self.LEFT = "left"
         self.RIGHT = "right"
 
-        self.config           = config
+        self.config              = config
 
-        self.game             = pygame
-        self.display          = display
-        self.environment      = environment
-        self.environment_size = display_size
+        self.game                = pygame
+        self.display             = display
+        self.environment         = environment
+        self.environment_size    = display_size
 
-        self.controller_init  = controller_init
-        self.controller       = Controller(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH, self.controller_init)
+        self.controller_weights  = controller_weights
+        self.controller          = Controller_2(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH, self.controller_weights)
+        # self.controller          = Controller(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH, self.controller_weights)
 
-        self.velocity_left    = 0
-        self.velocity_right   = 0
-        self.angle            = math.radians(angle_degree)
-        self.position         = position
-        self.colour           = colour
-        self.size             = size
+        self.velocity_left       = 0
+        self.velocity_right      = 0
+        self.max_velocity        = max_velocity
+        self.angle               = math.radians(angle_degree)
+        self.position            = position
+        self.colour              = colour
+        self.size                = size
 
         self.sensors = self.initialize_sensors(self.config.SENSOR_COUNT, angle_degree, self.config.SENSOR_RANGE, self.config.SENSOR_COLOUR, environment)
         self.check_sensors()
@@ -123,7 +126,7 @@ class Robot:
         self.update_position(x_updated, y_updated)
         self.rotate(rotation)
 
-        return self.position, col_detected #(self.position, 
+        return self.position, col_detected #(self.position,
 
 
     def update_position(self, x, y):
@@ -181,8 +184,15 @@ class Robot:
                 colour = (222, 70, 10)
             self.game.draw.aaline(self.display, colour, sensor.root_vector, sensor.direction_vector)
 
-    def controller_process(self):
-        directions = self.controller.process(self.sensors)
-        self.acellarate(self.LEFT, directions[0])
-        self.acellarate(self.RIGHT, directions[1])
-        self.controller.velocity_queue.put([self.velocity_left, self.velocity_right])
+    def controller_process(self, controller = None):
+        controller = self.controller if controller == None else controller
+
+        controller_output = self.controller.process(self.sensors)
+
+        if controller.output_kind == "relative":
+            directions = self.controller.process(self.sensors)
+            self.acellarate(self.LEFT,  directions[0])
+            self.acellarate(self.RIGHT, directions[1])
+        else:
+            self.velocity_left  = self.max_velocity * controller_output[0]
+            self.velocity_right = self.max_velocity * controller_output[1]
