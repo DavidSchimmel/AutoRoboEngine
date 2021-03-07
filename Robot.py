@@ -48,7 +48,8 @@ class Robot:
 
     def draw(self):
         self.draw_explicit(self.game, self.display, self.colour, self.position, self.size, self.angle)
-        self.draw_sensors()
+        if self.config.DEBUG:
+            self.draw_sensors()
 
     def get_orientation_vector(self, angle_radians, size_factor):
         orientation_normalized = (math.cos(angle_radians), math.sin(angle_radians))

@@ -8,33 +8,34 @@ class Config:
     KEYBOARD_MOVEMENT = 0 # 0=prohibited, 1=permitted
 
     # Board
-    BOARD_SIZE = BOARD_WIDTH, BOARD_HEIGHT = 760, 570
+    BOARD_SIZE = BOARD_WIDTH, BOARD_HEIGHT = 610, 440
     # FRAMES_PER_SECOND = 30
 
     OBSTACLE_COLOUR = (255, 255, 0)
 
     # Robot
     ACCELERATION     = 0.005
-    BALL_SIZE        = 30
+    BALL_SIZE        = 25
     MAX_VELOCITY     = 10
     SENSOR_COUNT     = 12
     SENSOR_FREQUENCY = 30
-    SENSOR_RANGE     = 75
+    SENSOR_RANGE     = 50
     SENSOR_COLOUR    = (0, 255, 0)
     MAX_SPEED        = 50
 
     # Evolutionary Algorithm
     NUMBER_OF_EXPERIMENTS = 3
-    POPULATION_SIZE       = 15
+    POPULATION_SIZE       = 22
     GENERATION_DURATION   = 360
     GENERATION_COUNT      = 12
     VELOCITY_QUEUE_LENGTH = 10
     MUTATION_RATE         = 0.05
     N_ROOM_EVAL           = 5 #number of room on which an individual is tested
     N_BEST                = 3
-    COLLISION_VAL         = -0.5
+    RANK_PROPRTIONS       = [8, 6, 4, 2, 1, 1]
+    COLLISION_VAL         = -0.00001
 
     # Controller related variables
     NN_LAYER_NODES        = [15,2]
     INITIAL_WEIGHT_RANGE  = [-1, 1]
-    VELOCITY_QUEUE_LENGTH = 30
+    VELOCITY_QUEUE_LENGTH = 5

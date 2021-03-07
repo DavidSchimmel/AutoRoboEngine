@@ -77,30 +77,45 @@ class Evolution():
                 else:
                     new_population.append(self.population[i].copy())
             return new_population
+        elif mode == 'rank_proportional':
+            rank_proportions = self.config.RANK_PROPRTIONS
+            for rank in range(len(rank_proportions)):
+                for count in range(rank_proportions[rank]):
+                    new_population.append(self.population[rank].copy())
+            return new_population
 
     def Xover(self, p1, p2, mode=0):
         child = []
-        for m in range(len(p1)):
-            if mode == 0: #arithmetic
-                if random.random()<0.5:
-                    x = p1[m] + p2[m]
-                else:
-                    x = p1[m] - p2[m]
-                child.append(x)
-            elif mode == 1: #uniform
-               a = p1[m].reshape(p1[m].shape[0]*p1[m].shape[1])
-               b = p2[m].reshape(p2[m].shape[0]*p2[m].shape[1])
-               x = np.array([])
-               step = random.randrange(1, p1[m].shape[0]*p1[m].shape[1])
-               for i in range(0, p1[m].shape[0]*p1[m].shape[1],step):
-                   if random.random()<0.5:
-                        x = np.concatenate((x, a[i:min(i+step, p1[m].shape[0]*p1[m].shape[1])]), axis=0)
-                   else:
-                        x = np.concatenate((x, b[i:min(i+step, p1[m].shape[0]*p1[m].shape[1])]), axis=0)
-               x = x.reshape((p1[m].shape[0],p1[m].shape[1]))
-               child.append(x)
-            elif mode == 2: #average
-                child.append((p1[m] + p2[m]) /2)
+        if mode == 3:
+            for layer_number in range(len(p1)):
+                for gene_number in range(p1[layer_number].shape[0]):
+                    if random.random() < 0.5:
+                        temp_gene                     = p1[layer_number][gene_number]
+                        p1[layer_number][gene_number] = p2[layer_number][gene_number]
+                        p2[layer_number][gene_number] = temp_gene
+            return p1, p2
+        else:
+            for m in range(len(p1)):
+                if mode == 0: #arithmetic
+                    if random.random()<0.5:
+                        x = p1[m] + p2[m]
+                    else:
+                        x = p1[m] - p2[m]
+                    child.append(x)
+                elif mode == 1: #uniform
+                    a = p1[m].reshape(p1[m].shape[0]*p1[m].shape[1])
+                    b = p2[m].reshape(p2[m].shape[0]*p2[m].shape[1])
+                    x = np.array([])
+                    step = random.randrange(1, p1[m].shape[0]*p1[m].shape[1])
+                    for i in range(0, p1[m].shape[0]*p1[m].shape[1],step):
+                        if random.random()<0.5:
+                                x = np.concatenate((x, a[i:min(i+step, p1[m].shape[0]*p1[m].shape[1])]), axis=0)
+                        else:
+                                x = np.concatenate((x, b[i:min(i+step, p1[m].shape[0]*p1[m].shape[1])]), axis=0)
+                    x = x.reshape((p1[m].shape[0],p1[m].shape[1]))
+                    child.append(x)
+                elif mode == 2: #average
+                    child.append((p1[m] + p2[m]) /2)
         return child
 
     def mutation(self, p):
@@ -114,7 +129,7 @@ class Evolution():
         self.initialization()
         for generation_counter in range(self.num_gen):
             self.evaluation(generation_counter)
-            self.population = self.selection_reproduction(mode='elitism', n_best=self.n_best)
+            self.population = self.selection_reproduction(mode='rank_proportional', n_best=self.n_best)
 
             if verbose: print('Generation ',generation_counter,' Best: ',self.population[0],' with value: ', self.fit[0])
             self.h_fmax.append(self.fit[0])
@@ -122,10 +137,40 @@ class Evolution():
             self.h_div.append(self.diversity())
 
             start = 0 if not mantain_best else self.n_best
-            for p in range(start, self.num_pop):
-                self.population[p] = self.Xover(self.population[p], self.population[random.randint(0, self.num_pop-1)], mode=random.randint(0, 2))
-                if random.random()<self.mutation_rate:
-                    self.population[p] = self.mutation(self.population[p])
+            new_generation = []
+            while len(self.population) > 0:
+                p1 = self.population.pop(random.randint(0, len(self.population) - 1))
+                p2 = self.population.pop(random.randint(0, len(self.population) - 1))
+                child_1, child_2 = self.Xover(p1, p2, mode=3)
+                new_generation.append(child_1)
+                new_generation.append(child_2)
+
+            for child_number in range(len(new_generation)):
+                if random.random() < self.mutation_rate:
+                    new_generation[child_number] = self.mutation(new_generation[child_number])
+
+            for child_number_1 in range(len(new_generation) - 1):
+                for child_number_2 in range(child_number_1 +1, len(new_generation)):
+                    child_1 = new_generation[child_number_1]
+                    child_2 = new_generation[child_number_2]
+
+                    are_identic = True
+                    for layer_number in range(len(child_1)):
+                        if np.any(child_1[layer_number] != child_2[layer_number]):
+                            are_indentic = False
+                            break
+                    if are_identic:
+                        new_generation[child_number_1] = self.mutation(child_1)
+
+                    # if new_generation[child_number_1] == new_generation[child_number_2]:
+                    #     new_generation[child_number_1] = self.mutation(new_generation[child_number_1])
+
+            self.population = new_generation
+
+            # for p in range(start, self.num_pop):
+            #     self.population[p] = self.Xover(self.population[p], self.population[random.randint(0, self.num_pop-1)], mode=random.randint(0, 2))
+            #     if random.random()<self.mutation_rate:
+            #         self.population[p] = self.mutation(self.population[p])
 
     def diversity(self):
         tmp = 0

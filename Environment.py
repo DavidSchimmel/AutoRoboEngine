@@ -66,7 +66,7 @@ def simulate_episode(population, show_graphically, generation_counter):
                 size, \
                 env, \
                 C.ROBOT_CYAN, \
-                [400, 400], \
+                [305, 280], \
                 90, \
                 config.BALL_SIZE, \
                 config.MAX_VELOCITY, \
