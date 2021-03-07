@@ -148,6 +148,8 @@ if __name__=='__main__':
     plt.figure('Diversity')
     plt.plot(ea.h_div)
     plt.show()
-  
+    print(ea.h_fmax)
+    print(ea.h_favg)
+    print(ea.h_div)
     
     

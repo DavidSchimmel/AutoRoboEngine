@@ -24,10 +24,11 @@ class Config:
     MAX_SPEED        = 15
 
     # Evolutionary Algorithm
-    POPULATION_SIZE = 10
-    GENERATION_DURATION = 600
+    POPULATION_SIZE = 10 #number of individuals
+    GENERATION_DURATION = 600 #steps in simulation
     GENERATION_COUNT = 50
-    NUM_GENERATION = 10
+    NUM_GENERATION = 10 #number of generations
+    N_ROOM_EVAL = 3 #number of room on which an individual is tested
     VELOCITY_QUEUE_LENGTH = 30
     MUTATION_RATE = 0.1 
     N_BEST = 3
