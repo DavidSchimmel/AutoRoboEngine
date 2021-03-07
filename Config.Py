@@ -27,7 +27,11 @@ class Config:
     NUMBER_OF_EXPERIMENTS = 3
     POPULATION_SIZE       = 22
     GENERATION_DURATION   = 360
+<<<<<<< HEAD
 #    GENERATION_DURATION   = 10
+=======
+    SAVE_INCREMENT_DISTANCE = 60
+>>>>>>> e89be5f973754815d3c474a34af4628b93c5ff39
     GENERATION_COUNT      = 12
     VELOCITY_QUEUE_LENGTH = 10
     MUTATION_RATE         = 0.05
@@ -35,6 +39,7 @@ class Config:
     N_BEST                = 3
     RANK_PROPRTIONS       = [8, 6, 4, 2, 1, 1]
     COLLISION_VAL         = -0.00001
+    
 
     # Controller related variables
     NN_LAYER_NODES        = [15,6,2] #Configuration of the network = number of noder for every layer

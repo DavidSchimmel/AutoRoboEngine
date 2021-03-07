@@ -17,15 +17,18 @@ exp_h_fmax=[]
 exp_h_favg=[]
 exp_h_div=[]
 
+
 if __name__=='__main__':
+    fp  = open("checkpoint.txt", "w+") #file pointer
     for e in range(config.NUMBER_OF_EXPERIMENTS):
         ea = Evolution(nn_layer)
-        ea.evolution(verbose=False)
+        ea.evolution(verbose=False, exp=e, fp=fp)
         exp_h_fmax.append(ea.h_fmax)
         exp_h_favg.append(ea.h_favg)
         exp_h_div.append(ea.h_div)
-        print('Experiment {e} done')
+        print('Experiment %d done' % (e))
 
+    fp.close()
     x=np.arange(ea.num_gen)
 
     exp_h_fmax = preprocessing_data(exp_h_fmax)
