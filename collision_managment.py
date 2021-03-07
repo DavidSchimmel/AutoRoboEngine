@@ -14,14 +14,13 @@ def create_environment(size, room_number, N_obstacle=4): #create a N_obstacle (r
     elif room_number == 1:
         obstacle_list.append(('r', (120, size[1]/2 - 40, size[0] - 240 , 20)))
     elif room_number == 2:
-        obstacle_list.append(('r', (200,         120, 20 , size[1] - 240)))
-        obstacle_list.append(('r', (size[0]-220, 120, 20 , size[1] - 240)))
+        obstacle_list.append(('r', (          160, 100, 20 , size[1] - 200)))
+        obstacle_list.append(('r', (size[0] - 180, 100, 20 , size[1] - 200)))
     elif room_number == 3:
-        obstacle_list.append(('r', (          200,           180, 40, 40)))
-        obstacle_list.append(('r', (          200, size[1] - 160, 40, 40)))
-        obstacle_list.append(('r', (size[0] - 240,           120, 40, 40)))
-        obstacle_list.append(('r', (size[0] - 240, size[1] - 160, 40, 40)))
-        obstacle_list.append(('r', (size[0]/2 - 20, size[1]/2 - 20, 40, 40)))
+        obstacle_list.append(('r', (          160,           120, 60, 60)))
+        obstacle_list.append(('r', (          160, size[1] - 160, 60, 60)))
+        obstacle_list.append(('r', (size[0] - 200,           120, 60, 60)))
+        obstacle_list.append(('r', (size[0] - 200, size[1] - 160, 60, 60)))
     elif room_number == 4:
         obstacle_list.append(('r', (          100,           200, 100, 100)))
         obstacle_list.append(('r', (          200, size[1] - 100, 300, 100)))
@@ -36,7 +35,7 @@ def create_environment(size, room_number, N_obstacle=4): #create a N_obstacle (r
         obstacle_list.append(('r', (350,         450, 200, 20)))
     elif room_number == 6: #Very easy collision remaining in the spanning place
         #obstacle_list.append(('r', (400,         400, 20 , 20))) #spam point
-       
+
         obstacle_list.append(('r', (300,         300, 20, size[1]-300)))
         obstacle_list.append(('r', (500,         180, 20, size[1]-180)))
         obstacle_list.append(('r', (170,         180, 330, 20)))
@@ -44,7 +43,7 @@ def create_environment(size, room_number, N_obstacle=4): #create a N_obstacle (r
         obstacle_list.append(('r', (380,         450, 150, 20)))
     elif room_number == 7: #Very easy collision remaining in the spanning place
         #obstacle_list.append(('r', (400,         400, 20 , 20))) #spam point
-       
+
         obstacle_list.append(('r', (200,         300, 400, 20)))
         obstacle_list.append(('r', (200,         450, 400, 20)))
 
