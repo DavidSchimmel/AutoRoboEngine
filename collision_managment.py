@@ -6,19 +6,36 @@ import math
 config = Config()
 
 #**** Environment obstacles and collisions detection ****#
-def create_environment(size, N_obstacle): #create a N_obstacle (random shape, position and dimension) obstacles in the environment
+def create_environment(size, room_number, N_obstacle): #create a N_obstacle (random shape, position and dimension) obstacles in the environment
     obstacle_list=[]
-    for o in range(N_obstacle):
-        if random()<0.0:
-            obstacle_list.append(('c',(random()*size[0], random()*size[1]), 10+random()*100))
-        else:
-            obstacle_list.append(('r',(random()*size[0], random()*size[1], 50+random()*100, 50+random()*100)))
+    if room_number   == 0:
+        pass
+    elif room_number == 1:
+        obstacle_list.append(('r', (120, size[1]/2 - 40, size[0] - 240 , 20)))
+    elif room_number == 2:
+        obstacle_list.append(('r', (200,         120, 20 , size[1] - 240)))
+        obstacle_list.append(('r', (size[0]-220, 120, 20 , size[1] - 240)))
+    elif room_number == 3:
+        obstacle_list.append(('r', (          200,           180, 40, 40)))
+        obstacle_list.append(('r', (          200, size[1] - 160, 40, 40)))
+        obstacle_list.append(('r', (size[0] - 240,           120, 40, 40)))
+        obstacle_list.append(('r', (size[0] - 240, size[1] - 160, 40, 40)))
+        obstacle_list.append(('r', (size[0]/2 - 20, size[1]/2 - 20, 40, 40)))
+    elif room_number == 4:
+        pass
 
-        #add window frame for collision management
-        obstacle_list.append(('r', (0, 0, size[0], 2)))
-        obstacle_list.append(('r', (0, 0, 2, size[1])))
-        obstacle_list.append(('r', (0, size[1]-2, size[0], size[1])))
-        obstacle_list.append(('r', (size[0]-2, 0, size[0], size[1])))
+    else:
+        for o in range(N_obstacle):
+            if random()<0.0:
+                obstacle_list.append(('c',(random()*size[0], random()*size[1]), 10+random()*100))
+            else:
+                obstacle_list.append(('r',(random()*size[0], random()*size[1], 50+random()*100, 50+random()*100)))
+
+    #add window frame for collision management
+    obstacle_list.append(('r', (0, 0, size[0], 2)))
+    obstacle_list.append(('r', (0, 0, 2, size[1])))
+    obstacle_list.append(('r', (0, size[1]-2, size[0], size[1])))
+    obstacle_list.append(('r', (size[0]-2, 0, size[0], size[1])))
     return obstacle_list
 
 def render_environment(screen, pg, ob_list): #print the environment on the screen

@@ -4,7 +4,7 @@ class Config:
     # general
     DEBUG = False
     SHOW = "ALL" #[ALL, BEST, NONE]
-    SHOW_INCREMENT_DISTANCE = 3 # number of generations for saving
+    SHOW_INCREMENT_DISTANCE = 1 # number of generations for saving
     KEYBOARD_MOVEMENT = 0 # 0=prohibited, 1=permitted
 
     # Board
@@ -30,6 +30,11 @@ class Config:
     GENERATION_COUNT      = 12
     VELOCITY_QUEUE_LENGTH = 10
     MUTATION_RATE         = 0.05
+    N_ROOM_EVAL           = 5 #number of room on which an individual is tested
+    N_BEST                = 3
+    COLLISION_VAL         = -0.5
 
     # Controller related variables
-    INITIAL_WEIGHT_RANGE = [-1, 1]
+    NN_LAYER_NODES        = [15,2]
+    INITIAL_WEIGHT_RANGE  = [-1, 1]
+    VELOCITY_QUEUE_LENGTH = 30

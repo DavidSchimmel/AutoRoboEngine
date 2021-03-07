@@ -18,16 +18,16 @@ else:
     from Environment import *
 
 class Evolution():
-    def __init__(self, nn_layer_list, num_pop=None, num_gen=None, mutation_rate=None, n_best=3):
+    def __init__(self, nn_layer_list=None, num_pop=None, num_gen=None, mutation_rate=None, n_best=3):
         self.config         = Config()
 
         self.weights_bounds = self.config.INITIAL_WEIGHT_RANGE #initial weight bounds
-        self.nn_layer_list  = nn_layer_list
+        self.nn_layer_list  = nn_layer_list if nn_layer_list != None else self.Config.NN_LAYER_NODES
 
         self.num_pop        = num_pop if num_pop != None else self.config.POPULATION_SIZE
         self.num_gen        = num_gen if num_gen != None else self.config.GENERATION_COUNT
         self.mutation_rate  = mutation_rate if mutation_rate != None else self.config.MUTATION_RATE
-        self.n_best         = n_best
+        self.n_best         = Config.N_BEST
 
         self.h_fmax         = []
         self.h_favg         = []
@@ -123,11 +123,9 @@ class Evolution():
 
             start = 0 if not mantain_best else self.n_best
             for p in range(start, self.num_pop):
+                self.population[p] = self.Xover(self.population[p], self.population[random.randint(0, self.num_pop-1)], mode=random.randint(0, 2))
                 if random.random()<self.mutation_rate:
-                    if random.random()<0.5:
-                        self.population[p] = self.Xover(self.population[p], self.population[random.randint(0, self.num_pop-1)], mode=random.randint(0, 2))
-                    else:
-                        self.population[p] = self.mutation(self.population[p])
+                    self.population[p] = self.mutation(self.population[p])
 
     def diversity(self):
         tmp = 0
@@ -152,3 +150,8 @@ if __name__=='__main__':
     plt.figure('Diversity')
     plt.plot(ea.h_div)
     plt.show()
+    print(ea.h_fmax)
+    print(ea.h_favg)
+    print(ea.h_div)
+
+
