@@ -12,7 +12,7 @@ def create_environment(size, room_number, N_obstacle=4): #create a N_obstacle (r
     if room_number   == 0:
         pass
     elif room_number == 1:
-        obstacle_list.append(('r', (120, size[1]/2 - 40, size[0] - 240 , 20)))
+        obstacle_list.append(('r', (120, size[1]/2 - 50, size[0] - 240 , 20)))
     elif room_number == 2:
         obstacle_list.append(('r', (200,         120, 20 , size[1] - 240)))
         obstacle_list.append(('r', (size[0]-220, 120, 20 , size[1] - 240)))
@@ -37,16 +37,16 @@ def create_environment(size, room_number, N_obstacle=4): #create a N_obstacle (r
     elif room_number == 6: #Very easy collision remaining in the spanning place
         #obstacle_list.append(('r', (400,         400, 20 , 20))) #spam point
        
-        obstacle_list.append(('r', (300,         300, 20, size[1]-300)))
+        obstacle_list.append(('r', (300,         350, 20, size[1]-350)))
         obstacle_list.append(('r', (500,         180, 20, size[1]-180)))
         obstacle_list.append(('r', (170,         180, 330, 20)))
         obstacle_list.append(('r', (170,         180, 20, 320)))
-        obstacle_list.append(('r', (380,         450, 150, 20)))
+        #obstacle_list.append(('r', (380,         450, 150, 20)))
     elif room_number == 7: #Very easy collision remaining in the spanning place
         #obstacle_list.append(('r', (400,         400, 20 , 20))) #spam point
        
-        obstacle_list.append(('r', (200,         300, 400, 20)))
-        obstacle_list.append(('r', (200,         450, 400, 20)))
+        obstacle_list.append(('r', (200,         350, 400, 20)))
+        obstacle_list.append(('r', (200,         200, 400, 20)))
 
     else:
         for o in range(N_obstacle):

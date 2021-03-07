@@ -3,6 +3,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 from Config import Config
+import json
 
 DEBUG = False
 if DEBUG:
@@ -125,16 +126,21 @@ class Evolution():
             child.append(p[m] + noise)
         return child
 
-    def evolution(self, verbose=True, mantain_best=True):
+    def evolution(self, verbose=True, mantain_best=True, exp=0, fp=None):
         self.initialization()
         for generation_counter in range(self.num_gen):
             self.evaluation(generation_counter)
             self.population = self.selection_reproduction(mode='rank_proportional', n_best=self.n_best)
 
+            #Log functions
             if verbose: print('Generation ',generation_counter,' Best: ',self.population[0],' with value: ', self.fit[0])
             self.h_fmax.append(self.fit[0])
             self.h_favg.append(sum(self.fit)/len(self.fit))
             self.h_div.append(self.diversity())
+            if generation_counter%Config.SAVE_INCREMENT_DISTANCE==0 and fp!=None:
+                fp.write("Exp. %d Gen. %d -> Best with value:  %f \n" % (exp, generation_counter,self.fit[0]))
+                fp.write(json.dumps(self.population[0], cls=NumpyEncoder)+"\n")
+                print(json.dumps(self.population[0], cls=NumpyEncoder))
 
             start = 0 if not mantain_best else self.n_best
             new_generation = []
@@ -180,10 +186,15 @@ class Evolution():
                     tmp += np.average(np.power(self.population[i][m]-self.population[j][m],2))
         return tmp
 
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
 
 if __name__=='__main__':
     #Run 1 experiment and show the results
-    ea = Evolution([15, 2])
+    ea = Evolution(Config.NN_LAYER_NODES)
     ea.evolution(verbose=False)
     plt.figure()
     plt.title('Max fitness')
