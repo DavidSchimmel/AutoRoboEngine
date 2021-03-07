@@ -137,7 +137,7 @@ class Evolution():
             self.h_fmax.append(self.fit[0])
             self.h_favg.append(sum(self.fit)/len(self.fit))
             self.h_div.append(self.diversity())
-            if generation_counter%Config.SAVE_INCREMENT_DISTANCE==0 and fp!=None:
+            if generation_counter % Config.SAVE_INCREMENT_DISTANCE == 0:
                 fp.write("Exp. %d Gen. %d -> Best with value:  %f \n" % (exp, generation_counter,self.fit[0]))
                 fp.write(json.dumps(self.population[0], cls=NumpyEncoder)+"\n")
                 print(json.dumps(self.population[0], cls=NumpyEncoder))
