@@ -30,11 +30,11 @@ class Config:
     GENERATION_COUNT      = 12
     VELOCITY_QUEUE_LENGTH = 10
     MUTATION_RATE         = 0.05
-    N_ROOM_EVAL           = 5 #number of room on which an individual is tested
+    N_ROOM_EVAL           = 8 #number of room on which an individual is tested
     N_BEST                = 3
     COLLISION_VAL         = -0.5
 
     # Controller related variables
-    NN_LAYER_NODES        = [15,2]
+    NN_LAYER_NODES        = [15,6,2] #Configuration of the network = number of noder for every layer
     INITIAL_WEIGHT_RANGE  = [-1, 1]
     VELOCITY_QUEUE_LENGTH = 30

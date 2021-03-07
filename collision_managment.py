@@ -2,11 +2,12 @@ from random import random
 import Constants as C
 from Config import Config
 import math
+import sys, pygame
 
 config = Config()
 
 #**** Environment obstacles and collisions detection ****#
-def create_environment(size, room_number, N_obstacle): #create a N_obstacle (random shape, position and dimension) obstacles in the environment
+def create_environment(size, room_number, N_obstacle=4): #create a N_obstacle (random shape, position and dimension) obstacles in the environment
     obstacle_list=[]
     if room_number   == 0:
         pass
@@ -22,7 +23,30 @@ def create_environment(size, room_number, N_obstacle): #create a N_obstacle (ran
         obstacle_list.append(('r', (size[0] - 240, size[1] - 160, 40, 40)))
         obstacle_list.append(('r', (size[0]/2 - 20, size[1]/2 - 20, 40, 40)))
     elif room_number == 4:
-        pass
+        obstacle_list.append(('r', (          100,           200, 100, 100)))
+        obstacle_list.append(('r', (          200, size[1] - 100, 300, 100)))
+        obstacle_list.append(('r', (size[0] - 500,           100, 100, 100)))
+        obstacle_list.append(('r', (size[0] - 200, size[1] - 400, 100, 100)))
+    elif room_number == 5: #HIGH evol pressure
+        #obstacle_list.append(('r', (400,         400, 20 , 20))) #spam point
+        obstacle_list.append(('r', (200,         120, 20 , size[1] - 240)))
+        obstacle_list.append(('r', (200,         120, size[1] - 240 , 20)))
+        obstacle_list.append(('r', (size[1] - 40,         120, 20 , size[1])))
+        obstacle_list.append(('r', (350,         300, 200, 20)))
+        obstacle_list.append(('r', (350,         450, 200, 20)))
+    elif room_number == 6: #Very easy collision remaining in the spanning place
+        #obstacle_list.append(('r', (400,         400, 20 , 20))) #spam point
+       
+        obstacle_list.append(('r', (300,         300, 20, size[1]-300)))
+        obstacle_list.append(('r', (500,         180, 20, size[1]-180)))
+        obstacle_list.append(('r', (170,         180, 330, 20)))
+        obstacle_list.append(('r', (170,         180, 20, 320)))
+        obstacle_list.append(('r', (380,         450, 150, 20)))
+    elif room_number == 7: #Very easy collision remaining in the spanning place
+        #obstacle_list.append(('r', (400,         400, 20 , 20))) #spam point
+       
+        obstacle_list.append(('r', (200,         300, 400, 20)))
+        obstacle_list.append(('r', (200,         450, 400, 20)))
 
     else:
         for o in range(N_obstacle):
@@ -151,3 +175,14 @@ def get_line_normal_form(x1, x2, y1, y2):
         a = (y2 - y1) / (x2 - x1)
     b = y1 - (x1 * a)
     return a, b
+
+
+if __name__=='__main__': #Render a room
+    pygame.init()
+    screen = pygame.display.set_mode(Config.BOARD_SIZE)
+    env = create_environment(Config.BOARD_SIZE, 7)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+        render_environment(screen, pygame, env)
+        pygame.display.flip()

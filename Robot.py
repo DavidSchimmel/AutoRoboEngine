@@ -19,7 +19,7 @@ class Robot:
         self.environment_size    = display_size
 
         self.controller_weights  = controller_weights
-        self.controller          = Controller_2(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH, self.controller_weights)
+        self.controller          = Controller(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH, self.controller_weights)
         # self.controller          = Controller(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH, self.controller_weights)
 
         self.velocity_left       = 0
