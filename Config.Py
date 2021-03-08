@@ -26,15 +26,15 @@ class Config:
     # Evolutionary Algorithm
     NUMBER_OF_EXPERIMENTS = 3
     POPULATION_SIZE       = 22
-    GENERATION_DURATION   = 360
-    SAVE_INCREMENT_DISTANCE = 60
-    GENERATION_COUNT      = 12
+    GENERATION_DURATION   = 360 #tick for experiments
+    SAVE_INCREMENT_DISTANCE = 4 #checkpoint
+    GENERATION_COUNT      = 12 #number of generations
     VELOCITY_QUEUE_LENGTH = 10
     MUTATION_RATE         = 0.05
     N_ROOM_EVAL           = 8 #number of room on which an individual is tested
     N_BEST                = 3
     RANK_PROPRTIONS       = [8, 6, 4, 2, 1, 1]
-    COLLISION_VAL         = -0.00001
+    COLLISION_VAL         = -0.01 #0.00001
     
 
     # Controller related variables
