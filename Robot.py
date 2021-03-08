@@ -5,6 +5,7 @@ from collision_managment import resolve_collision
 from Sensor import Sensor
 from Controller import Controller
 from Controller_2 import Controller_2
+from Controller_3 import Controller_3
 
 class Robot:
     def __init__(self, config, pygame, display, display_size, environment, colour, position, angle_degree, size, max_velocity, controller_weights):
@@ -19,7 +20,7 @@ class Robot:
         self.environment_size    = display_size
 
         self.controller_weights  = controller_weights
-        self.controller          = Controller_2(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH, self.controller_weights)
+        self.controller          = Controller_3(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH, self.controller_weights)
         # self.controller          = Controller(config.MAX_SPEED, self.config.SENSOR_COUNT, self.config.VELOCITY_QUEUE_LENGTH, self.controller_weights)
 
         self.velocity_left       = 0

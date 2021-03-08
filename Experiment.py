@@ -5,7 +5,7 @@ from Config import Config
 config = Config()
 
 
-nn_layer = [19, 6, 2]
+nn_layer = config.NN_LAYER_NODES
 
 def preprocessing_data(x):
     avg = np.average(x, axis=0)

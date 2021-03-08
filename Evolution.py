@@ -1,4 +1,4 @@
-#Simone
+#Simone and David
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -177,7 +177,7 @@ class Evolution():
             #     self.population[p] = self.Xover(self.population[p], self.population[random.randint(0, self.num_pop-1)], mode=random.randint(0, 2))
             #     if random.random()<self.mutation_rate:
             #         self.population[p] = self.mutation(self.population[p])
-        
+
 
     def diversity(self):
         tmp = 0
