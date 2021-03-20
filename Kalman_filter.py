@@ -5,7 +5,7 @@ MAP = [[0,0,1],[1,1,2],[1,2,3],[4,4,4]]
 
 def kalman_filter(mu_t_1, V_t_1, u_t, z_t): #Pose extimation
     A = np.identity(3)
-    #C = np.ones((3,3))
+    C = np.identity(3)
     dt = 1
     theta = mu_t_1[2]
     B = np.array([[dt*cos(theta), 0],[dt*sin(theta), 0],[0, dt]])

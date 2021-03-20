@@ -16,39 +16,28 @@ class Config:
     # Robot
     ACCELERATION     = 0.005
     BALL_SIZE        = 25
-
+    MAX_VELOCITY          = 10
     SENSOR_COUNT     = 12
     SENSOR_FREQUENCY = 30
-
+    SENSOR_RANGE          = 50
     SENSOR_COLOUR    = (0, 255, 0)
     MAX_SPEED        = 50
 
+    LANDMARK_RANGE   = 300
+
     # Evolutionary Algorithm
-
-
-
-    SAVE_INCREMENT_DISTANCE = 1 #checkpoint
-
-
-
-    N_ROOM_EVAL           = 6 #number of room on which an individual is tested
-    N_BEST                = 3
-
-
-
-
-    # Controller related variables
-
-
-    MAX_VELOCITY          = 10
-    SENSOR_RANGE          = 50
     NUMBER_OF_EXPERIMENTS = 3
     POPULATION_SIZE       = 22
     GENERATION_DURATION   = 390
     GENERATION_COUNT      = 50
+    SAVE_INCREMENT_DISTANCE = 1 #checkpoint
     VELOCITY_QUEUE_LENGTH = 6
     MUTATION_RATE         = 0.05
     RANK_PROPRTIONS       = [8, 6, 4, 2, 1, 1]
+    N_ROOM_EVAL           = 6 #number of room on which an individual is tested
+    N_BEST                = 3
     COLLISION_VAL         = -0.0001
+
+    # Controller related variables
     NN_LAYER_NODES        = [17,4,2]
     INITIAL_WEIGHT_RANGE  = [-1, 1]

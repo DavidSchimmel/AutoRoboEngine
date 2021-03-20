@@ -5,7 +5,7 @@ from Robot import Robot
 from collision_managment import create_environment, render_environment
 from Kalman_filter import *
 import numpy as np
-from math import sqrt
+import math
 import json
 import Debug
 
@@ -35,19 +35,40 @@ def clear_room(c, R, blackboard):
         for y in range( round(-R*sqrt(1-x*x/(R*R))) , round(R*sqrt(1-x*x/(R*R))) ):
             blackboard[ min(blackboard.shape[0]-1, max(0, cx+x)) ][ min(blackboard.shape[1], max(0, cy+y)) ]=1
 
-def visualize_autolocation_info(display, true_poses, belief_poses, uncertainties):
+def visualize_autolocation_info(display, true_poses, belief_poses, uncertainties, ellipses_distance):
 
-    # draw actual path
     for i in range(len(true_poses) - 1):
+        # draw actual path
         real_position_t_0 = (true_poses[i][0]  , true_poses[i][1])
         real_position_t_1   = (true_poses[i+1][0], true_poses[i+1][1])
         pygame.draw.aaline(display, (123, 12, 12), real_position_t_0, real_position_t_1)
 
-    # draw belief-path
-    for i in range(len(belief_poses) - 1):
+        # draw belief-path
         belief_position_t_0 = (belief_poses[i][0]  , belief_poses[i][1])
         belief_position_t_1   = (belief_poses[i+1][0], belief_poses[i+1][1])
         pygame.draw.aaline(display, (12, 123, 123), belief_position_t_0, belief_position_t_1)
+
+        # draw the ellipsis
+        if i % ellipses_distance == 0:
+            uncertainty = uncertainties[i]
+            assumed_x = belief_poses[i][0]
+            assumed_y = belief_poses[i][1]
+            omega     = belief_poses[i][2]
+            unrodated_x = assumed_x - (uncertainty[0][0] / 2)
+            unrotated_y = assumed_y - (uncertainty[1][1] / 2)
+
+            upper_left_x = assumed_x + math.cos(omega) * (unrodated_x - assumed_x) - math.sin(omega) * (unrotated_y - assumed_y)
+            upper_left_y = assumed_y + math.sin(omega) * (unrodated_x - assumed_x) + math.cos(omega) * (unrotated_y - assumed_y)
+
+            if upper_left_x > assumed_x:
+                upper_left_x = upper_left_x - ((upper_left_x - assumed_x) * 2)
+            if upper_left_y > assumed_y:
+                upper_left_y = upper_left_y - ((upper_left_y - assumed_y) * 2)
+
+            width        = (assumed_x - upper_left_x) * 2
+            height       = (assumed_y - upper_left_y) * 2
+
+            pygame.draw.ellipse(display, (255,255,255), (upper_left_x, upper_left_y, width, height), width=1)
 
     return
 
@@ -66,7 +87,7 @@ for i in range(len(weights_json_list)):
     blackboard=np.zeros(config.BOARD_SIZE, dtype='bool')
 
     ### visualization for the autolocation
-    ADVANCED_VISUALIZATION_DISTANCE = 50
+    ADVANCED_VISUALIZATION_DISTANCE = 10
     true_poses    = []
     belief_poses  = []
     uncertainties = []
@@ -74,7 +95,7 @@ for i in range(len(weights_json_list)):
 
     true_poses.append(  [robot.position[0], robot.position[1], robot.angle])
     belief_poses.append([robot.position[0], robot.position[1], robot.angle])
-    uncertainties.append(np.random.random((3, 3)))
+    uncertainties.append(np.identity((3)))
 
     for tick in range(400): #config.GENERATION_DURATION
 
@@ -94,9 +115,7 @@ for i in range(len(weights_json_list)):
         robot.check_sensors()
         render_environment(screen, pygame, env)
         robot.draw()
-
-        ### add kalman experiment visualizations
-        visualize_autolocation_info(screen, true_poses, belief_poses, uncertainties)
+        visualize_autolocation_info(screen, true_poses, belief_poses, uncertainties, ADVANCED_VISUALIZATION_DISTANCE)
         ###
 
         Debug.print_debug_info(screen, "Generation: {:0.0f}".format(i*10+1), (50, 10))
