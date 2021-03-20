@@ -85,7 +85,7 @@ class Robot:
 
             self.update_position(x_updated, y_updated)
 
-            return self.position, col_detected
+            return self.position, col_detected, velocity, 0
 
         omega = (self.velocity_right - self.velocity_left) / self.size
         R = (self.size / 2) * (self.velocity_right + self.velocity_left) / (self.velocity_right - self.velocity_left)
@@ -96,6 +96,7 @@ class Robot:
         x_updated  = math.cos(omega * delta_t) * (self.position[0] - ICC_x) - math.sin(omega * delta_t) * (self.position[1] - ICC_y) + ICC_x
         y_updated  = math.sin(omega * delta_t) * (self.position[0] - ICC_x) + math.cos(omega * delta_t) * (self.position[1] - ICC_y) + ICC_y
 
+        velocity = (self.velocity_right + self.velocity_left) / 2
         rotation = omega * delta_t
 
         if(resolve_collision((self.position[0], self.position[1]), (x_updated, y_updated), self.size, self.environment, self.environment_size)):
@@ -128,7 +129,7 @@ class Robot:
         self.update_position(x_updated, y_updated)
         self.rotate(rotation)
 
-        return self.position, col_detected #(self.position,
+        return self.position, col_detected, velocity, rotation
 
 
     def update_position(self, x, y):
