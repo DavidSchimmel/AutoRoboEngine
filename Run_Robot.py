@@ -101,7 +101,7 @@ def get_sensor_landmarks(pygame, display, current_position, landmark_list, obsta
         for landmark in visible_landmarks:
             pygame.draw.aaline(display, (200, 255, 150), (current_position[0], current_position[1]), (landmark[0], landmark[1]))
 
-    return 1
+    return visible_landmarks
 
 
 for i in range(len(weights_json_list)):
