@@ -2,7 +2,7 @@ import sys, pygame
 from Config import Config
 import Constants as C
 from Robot import Robot
-from collision_managment import create_environment, render_environment
+from collision_managment import create_environment, render_environment, find_intersection
 from Kalman_filter import *
 import numpy as np
 import math
@@ -25,7 +25,16 @@ weights_json_list = [
     '[[[12.436207711026734, 19.813199052158318, 41.451261275964775, 7.780285411588835], [-15.04840943274413, 23.195629336142613, 4.248098641163106, -7.085317102663233], [12.291087777608958, 8.493287318109775, -4.355735014673529, 29.707295055973137], [13.744606029238145, -9.988227371691009, 7.366010060334624, 24.318220435470106], [-43.50191029943187, 0.42290526302442033, 3.9693120025827016, 44.899504829231894], [-6.634750841764881, -38.38874852254575, 32.12042292330189, -35.85277920295819], [24.033422208864373, 45.33964500375474, 27.752399061731673, -5.080514490842575], [11.184519530726215, 9.793055845842126, 25.980116855207708, -18.267735947108484], [8.244308176821438, 5.114372242243542, 8.18967785441971, -42.01800094463219], [-25.573267226554822, -17.87707419255912, 4.73886042335903, 0.6724212343285667], [-10.57401803581798, 5.90200776367455, 7.860842496975744, 36.52595241827874], [31.082066784151998, 44.16768708863421, 10.960102185943272, 41.265291566366635], [-22.38053677795859, 19.26672684259185, 19.24721373129088, 35.16542498776993], [-55.24159503313751, -14.933127430120951, 0.8367585907815754, 37.456086641107476], [-14.19885433521131, 33.762379801543695, 27.47574588912674, -0.5272021100828167], [-0.40269576877999214, -1.9769966558395609, -5.474701086483281, 9.71927798958588], [-17.901157736400165, 14.953896095216924, -22.644087164873014, 10.924982906678231]], [[-27.90233619648249, -0.43068333865285713], [-4.3010090026306536, 29.331935031924214], [-22.94228221398682, -34.80657240580969], [9.751064467343411, -6.880693690057349]]]',
 ]
 
-room_number = 4
+room_number = 1
+#room_number = 4
+
+
+
+### Landmarks for autolocation/triangulation
+landmarks = [
+    (119, )
+]
+
 
 def clear_room(c, R, blackboard):
     cx = round(c[0])
@@ -72,15 +81,33 @@ def visualize_autolocation_info(display, true_poses, belief_poses, uncertainties
 
     return
 
-def update_autolocation_info():
+def get_sensor_landmarks(pygame, display, current_position, landmark_list, obstacle_list, landmark_sensor_range):
+    visible_landmarks = []
+    for landmark in landmark_list:
+        direction_vector = [landmark[0] - current_position[0], landmark[1] - current_position[1]]
+        length = math.sqrt((direction_vector[1] - current_position[1])**2 + (direction_vector[0] - current_position[0])**2) - 5
+        if length > landmark_sensor_range:
+            continue
+        intersections = find_intersection(current_position, landmark, length, obstacle_list)
+        if len(intersections) > 0:
+            #pass
+            continue
+        visible_landmarks.append(landmark)
 
+    #get closest (this is just an arbitrary heuristic to deal with more than 3 visible sensors)
+    #...
 
-    return
+    if len(visible_landmarks) > 2:
+        for landmark in visible_landmarks:
+            pygame.draw.aaline(display, (200, 255, 150), (current_position[0], current_position[1]), (landmark[0], landmark[1]))
+
+    return 1
+
 
 for i in range(len(weights_json_list)):
     weights = json.loads(weights_json_list[i])
 
-    env=create_environment(Config.BOARD_SIZE, room_number)
+    env, landmarks=create_environment(Config.BOARD_SIZE, room_number)
     pygame.init()
     screen = pygame.display.set_mode(config.BOARD_SIZE)
     robot = Robot(config, pygame, screen, config.BOARD_SIZE, env, C.ROBOT_CYAN, [305, 280], 90, config.BALL_SIZE, config.MAX_VELOCITY, weights)
@@ -115,6 +142,7 @@ for i in range(len(weights_json_list)):
         robot.check_sensors()
         render_environment(screen, pygame, env)
         robot.draw()
+        get_sensor_landmarks(pygame, screen, true_poses[tick], landmarks, env, config.LANDMARK_RANGE)
         visualize_autolocation_info(screen, true_poses, belief_poses, uncertainties, ADVANCED_VISUALIZATION_DISTANCE)
         ###
 

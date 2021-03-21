@@ -23,7 +23,7 @@ class Config:
     SENSOR_COLOUR    = (0, 255, 0)
     MAX_SPEED        = 50
 
-    LANDMARK_RANGE   = 300
+    LANDMARK_RANGE   = 600
 
     # Evolutionary Algorithm
     NUMBER_OF_EXPERIMENTS = 3

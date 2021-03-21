@@ -8,11 +8,21 @@ config = Config()
 
 #**** Environment obstacles and collisions detection ****#
 def create_environment(size, room_number, N_obstacle=4): #create a N_obstacle (random shape, position and dimension) obstacles in the environment
-    obstacle_list=[]
+    obstacle_list = []
+    landmark_list = []
     if room_number   == 0:
         pass
     elif room_number == 1:
         obstacle_list.append(('r', (120, size[1]/2 - 50, size[0] - 240 , 20)))
+
+        landmark_list.append((1 + 2, 1 + 2))
+        landmark_list.append((size[0] - 1 - 2, size[1] - 1 - 2))
+        landmark_list.append((1 + 2, size[1] - 1 - 2))
+        landmark_list.append((size[0] - 1 - 2, 1 + 2))
+        landmark_list.append((119, size[1]/2 - 51))
+        landmark_list.append((119, size[1]/2 - 50 + 21))
+        landmark_list.append((120+size[0]-239, size[1]/2 - 51))
+        landmark_list.append((120+size[0]-239, size[1]/2 - 50 + 21))
     elif room_number == 2:
         obstacle_list.append(('r', (          160, 100, 20 , size[1] - 200)))
         obstacle_list.append(('r', (size[0] - 180, 100, 20 , size[1] - 200)))
@@ -48,7 +58,7 @@ def create_environment(size, room_number, N_obstacle=4): #create a N_obstacle (r
     obstacle_list.append(('r', (0, 0, 2, size[1])))
     obstacle_list.append(('r', (0, size[1]-2, size[0], size[1])))
     obstacle_list.append(('r', (size[0]-2, 0, size[0], size[1])))
-    return obstacle_list
+    return obstacle_list, landmark_list
 
 def render_environment(screen, pg, ob_list): #print the environment on the screen
     screen.fill(C.BLACK)
@@ -168,7 +178,7 @@ def get_line_normal_form(x1, x2, y1, y2):
 if __name__=='__main__': #Render a room
     pygame.init()
     screen = pygame.display.set_mode(Config.BOARD_SIZE)
-    env = create_environment(Config.BOARD_SIZE, 5)
+    env, landmarks = create_environment(Config.BOARD_SIZE, 5)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()

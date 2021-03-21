@@ -39,7 +39,7 @@ def clear_room(c, R, blackboard):
 
 environments = []
 for room_number in range(Config.N_ROOM_EVAL):
-    environments.append(create_environment(Config.BOARD_SIZE, room_number, 4))
+    environments.append(create_environment(Config.BOARD_SIZE, room_number, 4)[0])
 
 def simulate_episode(population, show_graphically, generation_counter):
     #population = list of genotype = weights
