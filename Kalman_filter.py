@@ -9,8 +9,8 @@ def kalman_filter(mu_t_1, V_t_1, u_t, z_t): #Pose extimation
     dt = 1
     theta = mu_t_1[2]
     B = np.array([[dt*cos(theta), 0],[dt*sin(theta), 0],[0, dt]])
-    R = np.multiply(np.random.randn(3,3),np.eye(3,3))
-    Q = np.multiply(np.random.randn(3,3),np.eye(3,3))
+    R = np.multiply(0.00001*np.random.randn(3,3),np.eye(3,3))
+    Q = np.multiply(0.00001*np.random.randn(3,3),np.eye(3,3))
 
     _mu = A.dot(mu_t_1) + B.dot(u_t)
     _V = A.dot(V_t_1).dot(A.T) + R
@@ -34,7 +34,7 @@ def calc_features(p, mappa): #Sensor reading
     return f
 
 def triangulate(P0, P1, P2, r0, r1, r2):
-    print(P0, P1, P2, r0, r1, r2)
+    #print(P0, P1, P2, r0, r1, r2)
     EPSILON = 100
     dx = P1[0] - P0[0]
     dy = P1[1] - P0[1]

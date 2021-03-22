@@ -132,7 +132,9 @@ for i in range(len(weights_json_list)):
         belief_poses.append(mu)
         uncertainties.append(sigma)
         ###
-        zt=estimate_pose(mu, landmarks)
+
+        zt=estimate_pose([robot.position[0], robot.position[1], robot.angle], landmarks)
+
 
         clear_room(robot.position, Config.BALL_SIZE, blackboard)
         #update the sensors' measurement
