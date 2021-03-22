@@ -18,7 +18,7 @@ def kalman_filter(mu_t_1, V_t_1, u_t, z_t): #Pose extimation
     if z_t == None:
         return _mu, _V
 
-    K = _V.dot(C.T).        dot(np.linalg.inv(C.dot(_V).dot(C.T) + Q))
+    K = _V.dot(C.T).dot(np.linalg.inv(C.dot(_V).dot(C.T) + Q))
     mu = _mu + K.dot(z_t - C.dot(_mu))
     V = (np.eye(3,3)-K.dot(C)).dot(_V)
     return mu, V
@@ -62,25 +62,69 @@ def triangulate(P0, P1, P2, r0, r1, r2):
     if(abs(d2 - r2) < EPSILON): return intersectionPoint2_x, intersectionPoint2_y
 
 def estimate_pose(p, mappa): #p=pose_t, return z_t
-    if len(mappa) < 3:
+    if mappa == None or len(mappa) < 3:
         return None
 
-    pose = np.zeros(3)
-    c = 0
-    theta = 0
-    t = 0
-    f = calc_features(p, mappa)
-    for i in range(len(mappa)-2):
-        for j in range(i+1, len(mappa)-1):
-            for k in range(j+1, len(mappa)):
-                x, y = triangulate([mappa[i][0],mappa[i][1]], [mappa[j][0],mappa[j][1]], [mappa[k][0],mappa[k][1]], f[i][0], f[j][0], f[k][0])
-                pose[0]+=x
-                pose[1]+=y
-                c+=1
-    pose[0] = pose[0]/c
-    pose[1] = pose[1]/c
-    for i in range(len(mappa)):
-        pose[2] += atan2(mappa[i][1]-pose[1], mappa[i][0]-pose[0])-f[1]
-    pose[2] = pose[2]/c
-    return pose
+    # get intersection of two circles (gotten from stack overflow https://stackoverflow.com/questions/55816902/finding-the-intersection-of-two-circles)
+
+    x0 = mappa[0][0]
+    y0 = mappa[0][1]
+    r0 = sqrt((p[0]-x0)**2 + (p[1] - y0)**2)
+    x1 = mappa[1][0]
+    y1 = mappa[1][1]
+    r1 = sqrt((p[0]-x1)**2 + (p[1] - y1)**2)
+
+    d  = sqrt((x1-x0)**2 + (y1-y0)**2)
+
+    a  = (r0**2-r1**2+d**2)/(2*d)
+    h  = sqrt(r0**2-a**2)
+    x2 = x0+a*(x1-x0)/d
+    y2 = y0+a*(y1-y0)/d
+
+    x3 = x2+h*(y1-y0)/d
+    y3 = y2-h*(x1-x0)/d
+
+    x4=x2-h*(y1-y0)/d
+    y4=y2+h*(x1-x0)/d
+
+    intersection_1 = (x3, y3)
+    intersection_2 = (x4, y4)
+
+    # pick the point that is close to the distance of the third landmark
+
+    r_bearing = sqrt((p[0]-mappa[2][0])**2 + (p[1] - mappa[2][1])**2)
+
+    r_int_1 = sqrt((mappa[2][0]-intersection_1[0])**2 + (mappa[2][1] - intersection_1[1])**2)
+    r_int_2 = sqrt((mappa[2][0]-intersection_2[0])**2 + (mappa[2][1] - intersection_2[1])**2)
+
+    if abs(r_int_1 - r_bearing) < 0.1:
+        return [intersection_1[0], intersection_1[1], p[2]]
+    elif abs(r_int_2 - r_bearing) < 0.1:
+        return [intersection_2[0], intersection_2[1], p[2]]
+
+    return None
+
+
+# def estimate_pose(p, mappa): #p=pose_t, return z_t
+#     if len(mappa) < 3:
+#         return None
+
+#     pose = np.zeros(3)
+#     c = 0
+#     theta = 0
+#     t = 0
+#     f = calc_features(p, mappa)
+#     for i in range(len(mappa)-2):
+#         for j in range(i+1, len(mappa)-1):
+#             for k in range(j+1, len(mappa)):
+#                 x, y = triangulate([mappa[i][0],mappa[i][1]], [mappa[j][0],mappa[j][1]], [mappa[k][0],mappa[k][1]], f[i][0], f[j][0], f[k][0])
+#                 pose[0]+=x
+#                 pose[1]+=y
+#                 c+=1
+#     pose[0] = pose[0]/c
+#     pose[1] = pose[1]/c
+#     for i in range(len(mappa)):
+#         pose[2] += atan2(mappa[i][1]-pose[1], mappa[i][0]-pose[0])-f[1]
+#     pose[2] = pose[2]/c
+#     return pose
 

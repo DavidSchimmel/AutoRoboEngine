@@ -81,7 +81,7 @@ def visualize_autolocation_info(display, true_poses, belief_poses, uncertainties
 
     return
 
-def get_sensor_landmarks(pygame, display, current_position, landmark_list, obstacle_list, landmark_sensor_range):
+def get_sensor_landmarks(current_position, landmark_list, obstacle_list, landmark_sensor_range):
     visible_landmarks = []
     for landmark in landmark_list:
         direction_vector = [landmark[0] - current_position[0], landmark[1] - current_position[1]]
@@ -98,10 +98,15 @@ def get_sensor_landmarks(pygame, display, current_position, landmark_list, obsta
     #...
 
     if len(visible_landmarks) > 2:
-        for landmark in visible_landmarks:
-            pygame.draw.aaline(display, (200, 255, 150), (current_position[0], current_position[1]), (landmark[0], landmark[1]))
+        return visible_landmarks
 
-    return visible_landmarks
+    return None
+
+def visualize_triangulation_sensors(pygame, display, current_position, visible_landmarks):
+    if visible_landmarks == None:
+        return
+    for landmark in visible_landmarks:
+        pygame.draw.aaline(display, (200, 255, 150), (current_position[0], current_position[1]), (landmark[0], landmark[1]))
 
 
 for i in range(len(weights_json_list)):
@@ -118,22 +123,42 @@ for i in range(len(weights_json_list)):
     true_poses    = []
     belief_poses  = []
     uncertainties = []
+    vis_true_poses    = []
+    vis_belief_poses  = []
+    vis_uncertainties = []
     ###
 
     true_poses.append(  [robot.position[0], robot.position[1], robot.angle])
     belief_poses.append([robot.position[0], robot.position[1], robot.angle])
     uncertainties.append(np.identity((3)))
 
-    for tick in range(400): #config.GENERATION_DURATION
+    for tick in range(1500): #config.GENERATION_DURATION
 
         robot.controller_process()
         non_1, non_2, velocity , omega = robot.move()
 
         ### do the Kalman Filter and update relevant information
         true_poses.append([robot.position[0], robot.position[1], robot.angle])
+
+        visible_landmarks = get_sensor_landmarks(true_poses[tick], landmarks, env, config.LANDMARK_RANGE)
+        pose_after_sensor_correction = estimate_pose(true_poses[tick], visible_landmarks)
         mu, sigma = kalman_filter(belief_poses[tick], uncertainties[tick], np.array([velocity, omega]), None)
         belief_poses.append(mu)
         uncertainties.append(sigma)
+
+
+
+        ### cleanup for more appealing visualization TODO add visualization arrays for this to work
+        if len(belief_poses) > 200:
+            vis_start = math.floor(len(belief_poses)-200)
+            vis_start = vis_start - (vis_start%ADVANCED_VISUALIZATION_DISTANCE)
+            viz_true_poses = true_poses[vis_start:]
+            viz_belief_poses = belief_poses[vis_start:]
+            viz_uncertainties = uncertainties[vis_start:]
+        else:
+            viz_true_poses = true_poses
+            viz_belief_poses = belief_poses
+            viz_uncertainties = uncertainties
         ###
 
 
@@ -142,8 +167,8 @@ for i in range(len(weights_json_list)):
         robot.check_sensors()
         render_environment(screen, pygame, env)
         robot.draw()
-        get_sensor_landmarks(pygame, screen, true_poses[tick], landmarks, env, config.LANDMARK_RANGE)
-        visualize_autolocation_info(screen, true_poses, belief_poses, uncertainties, ADVANCED_VISUALIZATION_DISTANCE)
+        visualize_triangulation_sensors(pygame, screen, true_poses[tick], visible_landmarks)
+        visualize_autolocation_info(screen, viz_true_poses, viz_belief_poses, viz_uncertainties, ADVANCED_VISUALIZATION_DISTANCE)
         ###
 
         Debug.print_debug_info(screen, "Generation: {:0.0f}".format(i*10+1), (50, 10))
