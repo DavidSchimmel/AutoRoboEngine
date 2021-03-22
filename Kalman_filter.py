@@ -9,8 +9,11 @@ def kalman_filter(mu_t_1, V_t_1, u_t, z_t): #Pose extimation
     dt = 1
     theta = mu_t_1[2]
     B = np.array([[dt*cos(theta), 0],[dt*sin(theta), 0],[0, dt]])
-    R = np.multiply(0.00001*np.random.randn(3,3),np.eye(3,3))
-    Q = np.multiply(0.00001*np.random.randn(3,3),np.eye(3,3))
+    #R = np.multiply(10*np.random.randn(3,3),np.eye(3,3))
+    #Q = np.multiply(10*np.random.randn(3,3),np.eye(3,3))
+
+    R=20*np.eye(3,3)
+    Q=20*np.eye(3,3)
 
     _mu = A.dot(mu_t_1) + B.dot(u_t)
     _V = A.dot(V_t_1).dot(A.T) + R
