@@ -15,8 +15,8 @@ def kalman_filter(mu_t_1, V_t_1, u_t, z_t): #Pose extimation
     _mu = A.dot(mu_t_1) + B.dot(u_t)
     _V = A.dot(V_t_1).dot(A.T) + R
 
-    if z_t == None:
-        return _mu, _V
+    #if z_t == None:
+    #    return _mu, _V
 
     K = _V.dot(C.T).        dot(np.linalg.inv(C.dot(_V).dot(C.T) + Q))
     mu = _mu + K.dot(z_t - C.dot(_mu))
@@ -29,12 +29,13 @@ def calc_features(p, mappa): #Sensor reading
     for i in range(len(mappa)):
         r = sqrt(pow((mappa[i][0]-p[0]),2)+pow((mappa[i][1]-p[1]),2)) + psi[0]
         phi = atan2(mappa[i][1]-p[1],mappa[i][0]-p[0]) - p[2] + psi[1]
-        s = mappa[i][2] + psi[2]
-        f.append([r, phi, s])
+        #s = mappa[i][2] + psi[2]
+        f.append([r, phi, 0])
     return f
 
 def triangulate(P0, P1, P2, r0, r1, r2):
-    EPSILON = 0.001
+    print(P0, P1, P2, r0, r1, r2)
+    EPSILON = 100
     dx = P1[0] - P0[0]
     dy = P1[1] - P0[1]
     d = sqrt((dy*dy) + (dx*dx))
@@ -42,7 +43,7 @@ def triangulate(P0, P1, P2, r0, r1, r2):
     a = ((r0*r0) - (r1*r1) + (d*d)) / (2.0 * d)
     point2_x = P0[0] + (dx * a/d)
     point2_y = P0[1] + (dy * a/d)
-    h = sqrt((r0*r0) - (a*a))
+    h = sqrt(abs((r0*r0) - (a*a)))
     rx = -dy * (h/d)
     ry = dx * (h/d)
 
@@ -57,9 +58,9 @@ def triangulate(P0, P1, P2, r0, r1, r2):
     dx = intersectionPoint2_x - P2[0]
     dy = intersectionPoint2_y - P2[1]
     d2 = sqrt((dy*dy) + (dx*dx))
-
-    if(abs(d1 - r2) < EPSILON): return intersectionPoint1_x, intersectionPoint1_y
-    if(abs(d2 - r2) < EPSILON): return intersectionPoint2_x, intersectionPoint2_y
+    
+    if(abs(d1 - r2) < EPSILON): return (intersectionPoint1_x, intersectionPoint1_y)
+    if(abs(d2 - r2) < EPSILON): return (intersectionPoint2_x, intersectionPoint2_y)
 
 def estimate_pose(p, mappa): #p=pose_t, return z_t
     if len(mappa) < 3:
@@ -73,14 +74,14 @@ def estimate_pose(p, mappa): #p=pose_t, return z_t
     for i in range(len(mappa)-2):
         for j in range(i+1, len(mappa)-1):
             for k in range(j+1, len(mappa)):
-                x, y = triangulate([mappa[i][0],mappa[i][1]], [mappa[j][0],mappa[j][1]], [mappa[k][0],mappa[k][1]], f[i][0], f[j][0], f[k][0])
+                (x, y) = triangulate([mappa[i][0],mappa[i][1]], [mappa[j][0],mappa[j][1]], [mappa[k][0],mappa[k][1]], f[i][0], f[j][0], f[k][0])
                 pose[0]+=x
                 pose[1]+=y
                 c+=1
     pose[0] = pose[0]/c
     pose[1] = pose[1]/c
     for i in range(len(mappa)):
-        pose[2] += atan2(mappa[i][1]-pose[1], mappa[i][0]-pose[0])-f[1]
+        pose[2] += atan2(mappa[i][1]-pose[1], mappa[i][0]-pose[0])-f[i][1]
     pose[2] = pose[2]/c
     return pose
 

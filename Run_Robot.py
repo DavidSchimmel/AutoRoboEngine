@@ -28,8 +28,6 @@ weights_json_list = [
 room_number = 1
 #room_number = 4
 
-
-
 ### Landmarks for autolocation/triangulation
 landmarks = [
     (119, )
@@ -103,7 +101,6 @@ def get_sensor_landmarks(pygame, display, current_position, landmark_list, obsta
 
     return visible_landmarks
 
-
 for i in range(len(weights_json_list)):
     weights = json.loads(weights_json_list[i])
 
@@ -123,7 +120,7 @@ for i in range(len(weights_json_list)):
     true_poses.append(  [robot.position[0], robot.position[1], robot.angle])
     belief_poses.append([robot.position[0], robot.position[1], robot.angle])
     uncertainties.append(np.identity((3)))
-
+    zt = [robot.position[0], robot.position[1], robot.angle];
     for tick in range(400): #config.GENERATION_DURATION
 
         robot.controller_process()
@@ -131,11 +128,11 @@ for i in range(len(weights_json_list)):
 
         ### do the Kalman Filter and update relevant information
         true_poses.append([robot.position[0], robot.position[1], robot.angle])
-        mu, sigma = kalman_filter(belief_poses[tick], uncertainties[tick], np.array([velocity, omega]), None)
+        mu, sigma = kalman_filter(belief_poses[tick], uncertainties[tick], np.array([velocity, omega]), zt)
         belief_poses.append(mu)
         uncertainties.append(sigma)
         ###
-
+        zt=estimate_pose(mu, landmarks)
 
         clear_room(robot.position, Config.BALL_SIZE, blackboard)
         #update the sensors' measurement
