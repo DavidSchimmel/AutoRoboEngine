@@ -9,8 +9,13 @@ def kalman_filter(mu_t_1, V_t_1, u_t, z_t): #Pose extimation
     dt = 1
     theta = mu_t_1[2]
     B = np.array([[dt*cos(theta), 0],[dt*sin(theta), 0],[0, dt]])
-    R = np.multiply(np.random.randn(3,3),np.eye(3,3))
-    Q = np.multiply(np.random.randn(3,3),np.eye(3,3))
+    #R = np.multiply(10*np.random.randn(3,3),np.eye(3,3))
+    #Q = np.multiply(10*np.random.randn(3,3),np.eye(3,3))
+
+    R=np.eye(3,3)
+    Q=np.eye(3,3)
+    # R=20*np.eye(3,3)
+    # Q=20*np.eye(3,3)
 
     _mu = A.dot(mu_t_1) + B.dot(u_t)
     _V = A.dot(V_t_1).dot(A.T) + R
@@ -29,12 +34,13 @@ def calc_features(p, mappa): #Sensor reading
     for i in range(len(mappa)):
         r = sqrt(pow((mappa[i][0]-p[0]),2)+pow((mappa[i][1]-p[1]),2)) + psi[0]
         phi = atan2(mappa[i][1]-p[1],mappa[i][0]-p[0]) - p[2] + psi[1]
-        s = mappa[i][2] + psi[2]
-        f.append([r, phi, s])
+        #s = mappa[i][2] + psi[2]
+        f.append([r, phi, 0])
     return f
 
 def triangulate(P0, P1, P2, r0, r1, r2):
-    EPSILON = 0.001
+    #print(P0, P1, P2, r0, r1, r2)
+    EPSILON = 100
     dx = P1[0] - P0[0]
     dy = P1[1] - P0[1]
     d = sqrt((dy*dy) + (dx*dx))
@@ -42,7 +48,7 @@ def triangulate(P0, P1, P2, r0, r1, r2):
     a = ((r0*r0) - (r1*r1) + (d*d)) / (2.0 * d)
     point2_x = P0[0] + (dx * a/d)
     point2_y = P0[1] + (dy * a/d)
-    h = sqrt((r0*r0) - (a*a))
+    h = sqrt(abs((r0*r0) - (a*a)))
     rx = -dy * (h/d)
     ry = dx * (h/d)
 
@@ -58,8 +64,8 @@ def triangulate(P0, P1, P2, r0, r1, r2):
     dy = intersectionPoint2_y - P2[1]
     d2 = sqrt((dy*dy) + (dx*dx))
 
-    if(abs(d1 - r2) < EPSILON): return intersectionPoint1_x, intersectionPoint1_y
-    if(abs(d2 - r2) < EPSILON): return intersectionPoint2_x, intersectionPoint2_y
+    if(abs(d1 - r2) < EPSILON): return (intersectionPoint1_x, intersectionPoint1_y)
+    if(abs(d2 - r2) < EPSILON): return (intersectionPoint2_x, intersectionPoint2_y)
 
 def estimate_pose(p, mappa): #p=pose_t, return z_t
     if mappa == None or len(mappa) < 3:

@@ -28,8 +28,6 @@ weights_json_list = [
 room_number = 1
 #room_number = 4
 
-
-
 ### Landmarks for autolocation/triangulation
 landmarks = [
     (119, )
@@ -58,7 +56,13 @@ def visualize_autolocation_info(display, true_poses, belief_poses, uncertainties
         pygame.draw.aaline(display, (12, 123, 123), belief_position_t_0, belief_position_t_1)
 
         # draw the ellipsis
-        if i % ellipses_distance == 0:
+        if i % ellipses_distance == 0: # and i>0:
+
+            # draw belief-path discrete
+            # belief_position_t_0 = (belief_poses[i-ellipses_distance][0]  , belief_poses[i-ellipses_distance][1])
+            # belief_position_t_1   = (belief_poses[i][0], belief_poses[i][1])
+            # pygame.draw.aaline(display, (12, 123, 123), belief_position_t_0, belief_position_t_1)
+
             uncertainty = uncertainties[i]
             assumed_x = belief_poses[i][0]
             assumed_y = belief_poses[i][1]
@@ -108,7 +112,6 @@ def visualize_triangulation_sensors(pygame, display, current_position, visible_l
     for landmark in visible_landmarks:
         pygame.draw.aaline(display, (200, 255, 150), (current_position[0], current_position[1]), (landmark[0], landmark[1]))
 
-
 for i in range(len(weights_json_list)):
     weights = json.loads(weights_json_list[i])
 
@@ -146,8 +149,6 @@ for i in range(len(weights_json_list)):
         belief_poses.append(mu)
         uncertainties.append(sigma)
 
-
-
         ### cleanup for more appealing visualization TODO add visualization arrays for this to work
         if len(belief_poses) > 200:
             vis_start = math.floor(len(belief_poses)-200)
@@ -160,7 +161,6 @@ for i in range(len(weights_json_list)):
             viz_belief_poses = belief_poses
             viz_uncertainties = uncertainties
         ###
-
 
         clear_room(robot.position, Config.BALL_SIZE, blackboard)
         #update the sensors' measurement
