@@ -53,10 +53,16 @@ def visualize_autolocation_info(display, true_poses, belief_poses, uncertainties
         # draw belief-path
         belief_position_t_0 = (belief_poses[i][0]  , belief_poses[i][1])
         belief_position_t_1   = (belief_poses[i+1][0], belief_poses[i+1][1])
-        pygame.draw.aaline(display, (12, 123, 123), belief_position_t_0, belief_position_t_1)
+        #pygame.draw.aaline(display, (12, 123, 123), belief_position_t_0, belief_position_t_1)
 
         # draw the ellipsis
-        if i % ellipses_distance == 0:
+        if i % ellipses_distance == 0 and i>0:
+
+            # draw belief-path discrete
+            belief_position_t_0 = (belief_poses[i-ellipses_distance][0]  , belief_poses[i-ellipses_distance][1])
+            belief_position_t_1   = (belief_poses[i][0], belief_poses[i][1])
+            pygame.draw.aaline(display, (12, 123, 123), belief_position_t_0, belief_position_t_1)
+
             uncertainty = uncertainties[i]
             assumed_x = belief_poses[i][0]
             assumed_y = belief_poses[i][1]
